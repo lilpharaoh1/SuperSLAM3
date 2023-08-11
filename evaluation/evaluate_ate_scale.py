@@ -63,7 +63,7 @@ def align(model,data):
     numpy.set_printoptions(precision=3,suppress=True)
     model_zerocentered = model - model.mean(1)
     data_zerocentered = data - data.mean(1)
-    
+
     W = numpy.zeros( (3,3) )
     for column in range(model.shape[1]):
         W += numpy.outer(model_zerocentered[:,column],data_zerocentered[:,column])
@@ -84,8 +84,22 @@ def align(model,data):
 
     s = float(dots/norms)    
     
-    transGT = data.mean(1) - s*rot * model.mean(1)
-    trans = data.mean(1) - rot * model.mean(1)
+    
+    print(numpy.array([model[0, 0], model[1, 0], model[2, 0]]).reshape((3,1)))
+    
+    
+    offset = numpy.array([data[0,0] + model[0,0], data[1,0] + model[1,0], data[2,0] + model[2,0]]).reshape((3,1))
+    #offset = numpy.array([model[0, 0], model[1, 0], model[2, 0]]).reshape((3,1))
+    #offset = numpy.array([0.0, 0.0, 0.0]).reshape((3,1))
+
+    transGT = data.mean(1) - s*rot * model.mean(1)# + offset
+    trans = data.mean(1) - rot * model.mean(1)# + offset
+    
+    transGT = offset
+    trans = offset
+
+    #print("model.mean(1) : ", model.mean(1))
+    #print("data.mean(1) : ", data.mean(1))
 
     model_alignedGT = s*rot * model + transGT
     model_aligned = rot * model + trans
@@ -144,11 +158,19 @@ if __name__=="__main__":
     parser.add_argument('--save_associations', help='save associated first and aligned second trajectory to disk (format: stamp1 x1 y1 z1 stamp2 x2 y2 z2)')
     parser.add_argument('--plot', help='plot the first and the aligned second trajectory to an image (format: png)')
     parser.add_argument('--verbose', help='print all evaluation data (otherwise, only the RMSE absolute translational error in meters after alignment will be printed)', action='store_true')
+    parser.add_argument('--differences', help='plot differences on graph', action='store_true')
     parser.add_argument('--verbose2', help='print scale eror and RMSE absolute translational error in meters after alignment with and without scale correction', action='store_true')
     args = parser.parse_args()
 
     first_list = associate.read_file_list(args.first_file, False)
     second_list = associate.read_file_list(args.second_file, False)
+
+    offset = [float(first_list[list(first_list.keys())[0]][idx]) for idx in range(3)] # Never speak of this
+    #print(offset)
+    #for key in list(second_list.keys()):
+    #    second_list[key][0] = str(float(second_list[key][0]) - offset[0])
+    #    second_list[key][1] = str(float(second_list[key][1]) - offset[1])
+    #    second_list[key][2] = str(float(second_list[key][2]) - offset[2])
 
     matches = associate.associate(first_list, second_list,float(args.offset),float(args.max_difference))    
     if len(matches)<2:
@@ -161,37 +183,39 @@ if __name__=="__main__":
     second_xyz_full = numpy.matrix([[float(value)*float(args.scale) for value in sorted_second_list[i][1][0:3]] for i in range(len(sorted_second_list))]).transpose() # sorted_second_list.keys()]).transpose()
     rot,transGT,trans_errorGT,trans,trans_error, scale = align(second_xyz,first_xyz)
     
+    #trans = numpy.array(offset).reshape((3,1))
+
     second_xyz_aligned = scale * rot * second_xyz + trans
     second_xyz_notscaled = rot * second_xyz + trans
     second_xyz_notscaled_full = rot * second_xyz_full + trans
-    first_stamps = first_list.keys()
+    first_stamps = list(first_list.keys())
     first_stamps.sort()
     first_xyz_full = numpy.matrix([[float(value) for value in first_list[b][0:3]] for b in first_stamps]).transpose()
     
-    second_stamps = second_list.keys()
+    second_stamps = list(second_list.keys())
     second_stamps.sort()
     second_xyz_full = numpy.matrix([[float(value)*float(args.scale) for value in second_list[b][0:3]] for b in second_stamps]).transpose()
     second_xyz_full_aligned = scale * rot * second_xyz_full + trans
     
-    if args.verbose:
-        print "compared_pose_pairs %d pairs"%(len(trans_error))
+    if False:#args.verbose:
+        print("compared_pose_pairs %d pairs"%(len(trans_error)))
 
-        print "absolute_translational_error.rmse %f m"%numpy.sqrt(numpy.dot(trans_error,trans_error) / len(trans_error))
-        print "absolute_translational_error.mean %f m"%numpy.mean(trans_error)
-        print "absolute_translational_error.median %f m"%numpy.median(trans_error)
-        print "absolute_translational_error.std %f m"%numpy.std(trans_error)
-        print "absolute_translational_error.min %f m"%numpy.min(trans_error)
-        print "absolute_translational_error.max %f m"%numpy.max(trans_error)
-        print "max idx: %i" %numpy.argmax(trans_error)
+        print("absolute_translational_error.rmse %f m"%numpy.sqrt(numpy.dot(trans_error,trans_error) / len(trans_error)))
+        print("absolute_translational_error.mean %f m"%numpy.mean(trans_error))
+        print("absolute_translational_error.median %f m"%numpy.median(trans_error))
+        print("absolute_translational_error.std %f m"%numpy.std(trans_error))
+        print("absolute_translational_error.min %f m"%numpy.min(trans_error))
+        print("absolute_translational_error.max %f m"%numpy.max(trans_error))
+        print("max idx: %i" %numpy.argmax(trans_error))
     else:
         # print "%f, %f " % (numpy.sqrt(numpy.dot(trans_error,trans_error) / len(trans_error)),  scale)
         # print "%f,%f" % (numpy.sqrt(numpy.dot(trans_error,trans_error) / len(trans_error)),  scale)
-        print "%f,%f,%f" % (numpy.sqrt(numpy.dot(trans_error,trans_error) / len(trans_error)), scale, numpy.sqrt(numpy.dot(trans_errorGT,trans_errorGT) / len(trans_errorGT)))
+        print("%f,%f,%f" % (numpy.sqrt(numpy.dot(trans_error,trans_error) / len(trans_error)), scale, numpy.sqrt(numpy.dot(trans_errorGT,trans_errorGT) / len(trans_errorGT))))
         # print "%f" % len(trans_error)
     if args.verbose2:
-        print "compared_pose_pairs %d pairs"%(len(trans_error))
-        print "absolute_translational_error.rmse %f m"%numpy.sqrt(numpy.dot(trans_error,trans_error) / len(trans_error))
-        print "absolute_translational_errorGT.rmse %f m"%numpy.sqrt(numpy.dot(trans_errorGT,trans_errorGT) / len(trans_errorGT))
+        print("compared_pose_pairs %d pairs"%(len(trans_error)))
+        print("absolute_translational_error.rmse %f m"%numpy.sqrt(numpy.dot(trans_error,trans_error) / len(trans_error)))
+        print("absolute_translational_errorGT.rmse %f m"%numpy.sqrt(numpy.dot(trans_errorGT,trans_errorGT) / len(trans_errorGT)))
 
     if args.save_associations:
         file = open(args.save_associations,"w")
@@ -214,9 +238,21 @@ if __name__=="__main__":
         plot_traj(ax,first_stamps,first_xyz_full.transpose().A,'-',"black","ground truth")
         plot_traj(ax,second_stamps,second_xyz_full_aligned.transpose().A,'-',"blue","estimated")
         label="difference"
-        for (a,b),(x1,y1,z1),(x2,y2,z2) in zip(matches,first_xyz.transpose().A,second_xyz_aligned.transpose().A):
-            ax.plot([x1,x2],[y1,y2],'-',color="red",label=label)
-            label=""
+        if args.differences:
+            diff = []
+            for (a,b),(x1,y1,z1),(x2,y2,z2) in zip(matches,first_xyz.transpose().A,second_xyz_aligned.transpose().A):
+                trans = numpy.sqrt(numpy.power(x1 - x2, 2) + numpy.power(y1 - y2, 2) + numpy.power(z1 - z2, 2))
+                diff.append(trans)
+                ax.plot([x1,x2],[y1,y2],'-',color="red",label=label)
+                label=""
+            diff = numpy.array(diff)
+            if args.verbose:
+                print("absolute_translational_error.rmse %f m"%numpy.sqrt(numpy.dot(diff,diff) / len(diff)))
+                print("absolute_translational_error.mean %f m"%numpy.mean(diff))
+                print("absolute_translational_error.median %f m"%numpy.median(diff))
+                print("absolute_translational_error.std %f m"%numpy.std(diff))
+                print("absolute_translational_error.min %f m"%numpy.min(diff))
+                print("absolute_translational_error.max %f m"%numpy.max(diff))
             
         ax.legend()
             
@@ -225,5 +261,3 @@ if __name__=="__main__":
         plt.axis('equal')
         plt.savefig(args.plot,format="pdf")
 
-
-        

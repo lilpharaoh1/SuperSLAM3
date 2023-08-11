@@ -1675,6 +1675,7 @@ namespace ORB_SLAM3
 
     int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, const float th, const bool bMono)
     {
+        cout << "In Frame-to-Frame SearchByProjection..." << endl;
         int nmatches = 0;
 
         // Rotation Histogram (to check rotation consistency)

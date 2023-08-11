@@ -26,7 +26,8 @@
 #include <cv_bridge/cv_bridge.h>
 
 #include<opencv2/core/core.hpp>
-
+#include <opencv2/opencv.hpp>
+using namespace cv;
 #include"../../../include/System.h"
 
 using namespace std;
@@ -67,7 +68,7 @@ int main(int argc, char **argv)
     SLAM.Shutdown();
 
     // Save camera trajectory
-    SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
+    SLAM.SaveKeyFrameTrajectoryEuRoC("KeyFrameTrajectory.txt");
 
     ros::shutdown();
 
@@ -89,6 +90,7 @@ void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
     }
 
     mpSLAM->TrackMonocular(cv_ptr->image,cv_ptr->header.stamp.toSec());
+    imshow("Current Frame", cv_ptr->image);
 }
 
 

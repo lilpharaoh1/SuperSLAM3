@@ -604,7 +604,7 @@ void Tracking::newParameterLoader(Settings *settings) {
     Sophus::SE3f Tbc = settings->Tbc();
     mInsertKFsLost = settings->insertKFsWhenLost();
     mImuFreq = settings->imuFrequency();
-    mImuPer = 0.001; //1.0 / (double) mImuFreq;     //TODO: ESTO ESTA BIEN?
+    mImuPer = 1.0 / (double) mImuFreq;     //TODO: ESTO ESTA BIEN?
     float Ng = settings->noiseGyro();
     float Na = settings->noiseAcc();
     float Ngw = settings->gyroWalk();
@@ -1341,7 +1341,7 @@ bool Tracking::ParseIMUParamFile(cv::FileStorage &fSettings)
     if(!node.empty() && node.isInt())
     {
         mImuFreq = node.operator int();
-        mImuPer = 0.001; //1.0 / (double) mImuFreq;
+        mImuPer = 1.0 / (double) mImuFreq;
     }
     else
     {
@@ -1632,6 +1632,7 @@ void Tracking::PreintegrateIMU()
     }
 
     mvImuFromLastFrame.clear();
+    //cout << "mlQueueImuData.size() = " << mlQueueImuData.size() << endl;
     mvImuFromLastFrame.reserve(mlQueueImuData.size());
     if(mlQueueImuData.size() == 0)
     {
@@ -1647,9 +1648,14 @@ void Tracking::PreintegrateIMU()
             unique_lock<mutex> lock(mMutexImuQueue);
             if(!mlQueueImuData.empty())
             {
+		//cout << "mlQueueImuData.empty() == False" << endl;
                 IMU::Point* m = &mlQueueImuData.front();
                 cout.precision(17);
-                if(m->t<mCurrentFrame.mpPrevFrame->mTimeStamp-mImuPer)
+                //cout << "m->t = " << m->t << endl;
+		//cout << "mCurrentFrame.mpPrevFrame->mTimeStamp = " << mCurrentFrame.mpPrevFrame->mTimeStamp << endl;
+		//cout << "mCurrentFrame->mTimeStamp = " << mCurrentFrame.mTimeStamp << endl;
+		//cout << "mImuPer = " << mImuPer << endl;
+		if(m->t<mCurrentFrame.mpPrevFrame->mTimeStamp-mImuPer)
                 {
                     mlQueueImuData.pop_front();
                 }
@@ -1666,6 +1672,7 @@ void Tracking::PreintegrateIMU()
             }
             else
             {
+		//cout << "mlQueueImuData.empty() == True" << endl;
                 break;
                 bSleep = true;
             }
@@ -1673,6 +1680,8 @@ void Tracking::PreintegrateIMU()
         if(bSleep)
             usleep(500);
     }
+	
+    //cout << "mvImuFromLastFrame = " << mvImuFromLastFrame.size() << endl ;
 
     const int n = mvImuFromLastFrame.size()-1;
     if(n==0){
@@ -1731,7 +1740,7 @@ void Tracking::PreintegrateIMU()
 
     mCurrentFrame.setIntegrated();
 
-    //Verbose::PrintMess("Preintegration is finished!! ", Verbose::VERBOSITY_DEBUG);
+    Verbose::PrintMess("Preintegration is finished!! ", Verbose::VERBOSITY_DEBUG);
 }
 
 
@@ -1827,8 +1836,8 @@ void Tracking::Track()
         }
         else if(mCurrentFrame.mTimeStamp>mLastFrame.mTimeStamp+1.0)
         {
-            // cout << mCurrentFrame.mTimeStamp << ", " << mLastFrame.mTimeStamp << endl;
-            // cout << "id last: " << mLastFrame.mnId << "    id curr: " << mCurrentFrame.mnId << endl;
+            cout << mCurrentFrame.mTimeStamp << ", " << mLastFrame.mTimeStamp << endl;
+            cout << "id last: " << mLastFrame.mnId << "    id curr: " << mCurrentFrame.mnId << endl;
             if(mpAtlas->isInertial())
             {
 
@@ -1898,6 +1907,7 @@ void Tracking::Track()
 
     if(mState==NOT_INITIALIZED)
     {
+	// cout << "mState==NOT_INITIALIZED..." << endl;
         if(mSensor==System::STEREO || mSensor==System::RGBD || mSensor==System::IMU_STEREO || mSensor==System::IMU_RGBD)
         {
             StereoInitialization();
@@ -2450,9 +2460,11 @@ void Tracking::MonocularInitialization()
 
     if(!mbReadyToInitializate)
     {
+	//cout << "mbReadyToInitializate == False..." << endl;
         // Set Reference Frame
         if(mCurrentFrame.mvKeys.size()>100)
         {
+	    //cout << "mCurrentFrame.mvKeys.size > 100" << endl;
 
             mInitialFrame = Frame(mCurrentFrame);
             mLastFrame = Frame(mCurrentFrame);
@@ -2483,13 +2495,15 @@ void Tracking::MonocularInitialization()
         if (((int)mCurrentFrame.mvKeys.size()<=100)||((mSensor == System::IMU_MONOCULAR)&&(mLastFrame.mTimeStamp-mInitialFrame.mTimeStamp>1.0)))
         {
             mbReadyToInitializate = false;
-
+	    //cout << "Ready to initialize set to false, returning out of MonocularInitialization..." << endl;
             return;
         }
 
         // Find correspondences
         ORBmatcher matcher(0.9,true);
         int nmatches = matcher.SearchForInitialization(mInitialFrame,mCurrentFrame,mvbPrevMatched,mvIniMatches,100);
+
+	//cout << "nmatches in MonocularInitialize : " << nmatches << endl;	
 
         // Check if there are enough correspondences
         if(nmatches<100)
@@ -2500,6 +2514,8 @@ void Tracking::MonocularInitialization()
 
         Sophus::SE3f Tcw;
         vector<bool> vbTriangulated; // Triangulated Correspondences (mvIniMatches)
+
+	//cout << "ReconstructWithTwoView : " << mpCamera->ReconstructWithTwoViews(mInitialFrame.mvKeysUn,mCurrentFrame.mvKeysUn,mvIniMatches,Tcw,mvIniP3D,vbTriangulated) << endl;
 
         if(mpCamera->ReconstructWithTwoViews(mInitialFrame.mvKeysUn,mCurrentFrame.mvKeysUn,mvIniMatches,Tcw,mvIniP3D,vbTriangulated))
         {

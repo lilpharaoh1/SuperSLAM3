@@ -110,13 +110,16 @@ namespace ORB_SLAM3
         threadF.join();
 
         // Compute ratio of scores
+	//cout << "SH : " << SH << endl;
+	//cout << "SF : " << SF << endl;
         if(SH+SF == 0.f) return false;
         float RH = SH/(SH+SF);
+	//cout << "RH : " << RH << endl;
 
         float minParallax = 1.0;
-
+	
         // Try to reconstruct from homography or fundamental depending on the ratio (0.40-0.45)
-        if(RH>0.50) // if(RH>0.40)
+        if(RH>0.5) // if(RH>0.40)
         {
             //cout << "Initialization from Homography" << endl;
             return ReconstructH(vbMatchesInliersH,H, mK,T21,vP3D,vbTriangulated,minParallax,50);
@@ -456,7 +459,7 @@ namespace ORB_SLAM3
 
             const float squareDist2 = num1*num1/(a1*a1+b1*b1);
 
-            const float chiSquare2 = squareDist2*invSigmaSquare;
+    	    const float chiSquare2 = squareDist2*invSigmaSquare;
 
             if(chiSquare2>th)
                 bIn = false;
@@ -516,11 +519,28 @@ namespace ORB_SLAM3
         if(nGood4>0.7*maxGood)
             nsimilar++;
 
+	//cout << "---------------------------------" << endl;
+	//cout << "In ReconstructF..." << endl;
+	//cout << "maxGood<nMinGood : " << (maxGood<nMinGood) << endl;
+	//cout << "nsimilar > 1 : " << (nsimilar>1) << endl;
+
         // If there is not a clear winner or not enough triangulated points reject initialization
         if(maxGood<nMinGood || nsimilar>1)
         {
             return false;
         }
+
+	//cout << "Checking nGoods..." << endl;
+	//cout << "maxGood : " << maxGood << endl;
+	//cout << "nGood1 : " << nGood1 << endl;
+	//cout << "nGood2 : " << nGood2 << endl;
+	//cout << "nGood3 : " << nGood3 << endl;
+	//cout << "nGood4 : " << nGood4 << endl;
+	//cout << "minParallax : " << minParallax << endl;
+	//cout << "parallax1 : " << parallax1 << endl;
+	//cout << "parallax2 : " << parallax2 << endl;
+	//cout << "parallax3 : " << parallax3 << endl;
+	//cout << "parallax4 : " << parallax4 << endl;
 
         // If best reconstruction has enough parallax initialize
         if(maxGood==nGood1)
@@ -564,6 +584,8 @@ namespace ORB_SLAM3
                 return true;
             }
         }
+	
+	cout << "Best reconstruction didn't have enough parallax..." << endl;
 
         return false;
     }
