@@ -25,6 +25,7 @@
 #include<ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
 #include <super_msgs/MatchesStamped.h>
+#include <super_msgs/Matches.h>
 
 #include<opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
@@ -77,8 +78,19 @@ int main(int argc, char **argv)
 
 void SuperHandler::GrabMatches(const super_msgs::MatchesStampedPtr& msg)
 {
-    //mpSLAM->TrackSuper(msg->matches,msg->header.stamp.toSec());
-    cout << "in GrabMatches..." << endl;
+    const double &timestamp = msg->header.stamp.toSec();
+    vector<int> kpts0_x, kpts0_y, kpts1_x, kpts1_y;
+    vector<float> confidences;
+    for (int i = 0; i < msg->matches.keypoints0.features.size(); i++) { 
+        // cout << msg->matches.keypoints0.features[i].x << endl;
+        kpts0_x.push_back(msg->matches.keypoints0.features[i].x);
+        kpts0_y.push_back(msg->matches.keypoints0.features[i].y);
+        kpts1_x.push_back(msg->matches.keypoints1.features[i].x);
+        kpts1_y.push_back(msg->matches.keypoints1.features[i].y);
+        confidences.push_back(msg->matches.confidences[i]);
+    }
+
+    mpSLAM->TrackSuper(kpts0_x, kpts0_y, kpts1_x, kpts1_y, confidences, timestamp);
 }
 
 

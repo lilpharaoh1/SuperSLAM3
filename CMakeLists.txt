@@ -135,7 +135,6 @@ if(realsense2_FOUND)
     )
 endif()
 
-
 # Build examples
 
 # RGB-D examples
