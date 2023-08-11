@@ -1614,6 +1614,43 @@ Sophus::SE3f Tracking::GrabImageMonocular(const cv::Mat &im, const double &times
     return mCurrentFrame.GetPose();
 }
 
+void Tracking::GrabSuper(const vector<int> kpts0_x, const vector<int> kpts0_y, const vector<int> kpts1_x, const vector<int>kpts1_y, const double &timestamp, string filename)
+{
+    cout << "In Grab Super..." << endl;
+    mCurrentFrame = Frame(kpts0_x,kpts0_y,kpts1_x,kpts1_y,timestamp,mpIniORBextractor,mpORBVocabulary,mpCamera,mDistCoef,mbf,mThDepth);
+    // if (mSensor == System::MONOCULAR)
+    // {
+    //     if(mState==NOT_INITIALIZED || mState==NO_IMAGES_YET ||(lastID - initID) < mMaxFrames)
+    //         mCurrentFrame = Frame(mImGray,timestamp,mpIniORBextractor,mpORBVocabulary,mpCamera,mDistCoef,mbf,mThDepth);
+    //     else
+    //         mCurrentFrame = Frame(mImGray,timestamp,mpORBextractorLeft,mpORBVocabulary,mpCamera,mDistCoef,mbf,mThDepth);
+    // }
+    // else if(mSensor == System::IMU_MONOCULAR)
+    // {
+    //     if(mState==NOT_INITIALIZED || mState==NO_IMAGES_YET)
+    //     {
+    //         mCurrentFrame = Frame(mImGray,timestamp,mpIniORBextractor,mpORBVocabulary,mpCamera,mDistCoef,mbf,mThDepth,&mLastFrame,*mpImuCalib);
+    //     }
+    //     else
+    //         mCurrentFrame = Frame(mImGray,timestamp,mpORBextractorLeft,mpORBVocabulary,mpCamera,mDistCoef,mbf,mThDepth,&mLastFrame,*mpImuCalib);
+    // }
+
+    // if (mState==NO_IMAGES_YET)
+        // t0=timestamp;
+
+    // mCurrentFrame.mNameFile = filename;
+    // mCurrentFrame.mnDataset = mnNumDataset;
+
+// #ifdef REGISTER_TIMES
+    // vdORBExtract_ms.push_back(mCurrentFrame.mTimeORB_Ext);
+// #endif
+
+    lastID = mCurrentFrame.mnId;
+    Track();
+
+    // return mCurrentFrame.GetPose();
+}
+
 
 void Tracking::GrabImuData(const IMU::Point &imuMeasurement)
 {
@@ -2460,12 +2497,9 @@ void Tracking::MonocularInitialization()
 
     if(!mbReadyToInitializate)
     {
-	//cout << "mbReadyToInitializate == False..." << endl;
         // Set Reference Frame
         if(mCurrentFrame.mvKeys.size()>100)
         {
-	    //cout << "mCurrentFrame.mvKeys.size > 100" << endl;
-
             mInitialFrame = Frame(mCurrentFrame);
             mLastFrame = Frame(mCurrentFrame);
             mvbPrevMatched.resize(mCurrentFrame.mvKeysUn.size());
@@ -2501,7 +2535,7 @@ void Tracking::MonocularInitialization()
 
         // Find correspondences
         ORBmatcher matcher(0.9,true);
-        int nmatches = matcher.SearchForInitialization(mInitialFrame,mCurrentFrame,mvbPrevMatched,mvIniMatches,100);
+        int nmatches = matcher.SearchForSuperInitialization(mInitialFrame,mCurrentFrame,mvbPrevMatched,mvIniMatches,100);
 
 	//cout << "nmatches in MonocularInitialize : " << nmatches << endl;	
 

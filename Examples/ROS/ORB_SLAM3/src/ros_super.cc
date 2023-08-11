@@ -82,7 +82,6 @@ void SuperHandler::GrabMatches(const super_msgs::MatchesStampedPtr& msg)
     vector<int> kpts0_x, kpts0_y, kpts1_x, kpts1_y;
     vector<float> confidences;
     for (int i = 0; i < msg->matches.keypoints0.features.size(); i++) { 
-        // cout << msg->matches.keypoints0.features[i].x << endl;
         kpts0_x.push_back(msg->matches.keypoints0.features[i].x);
         kpts0_y.push_back(msg->matches.keypoints0.features[i].y);
         kpts1_x.push_back(msg->matches.keypoints1.features[i].x);
