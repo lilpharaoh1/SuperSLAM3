@@ -473,7 +473,7 @@ Sophus::SE3f System::TrackMonocular(const cv::Mat &im, const double &timestamp, 
     return Tcw;
 }
 
-    void System::TrackSuper(const vector<int> kpts0_x, const vector<int> kpts0_y, const vector<int> kpts1_x, const vector<int>kpts1_y, const vector<float> confidences, const double &timestamp, const vector<IMU::Point>& vImuMeas, string filename)
+    void System::TrackSuper(const vector<cv::Point2f> kpts, vector<int> mpts_prev, vector<int> mpts_curr, const vector<float> confidences, const double &timestamp, const vector<IMU::Point>& vImuMeas, string filename)
 {
 
     {
@@ -535,7 +535,8 @@ Sophus::SE3f System::TrackMonocular(const cv::Mat &im, const double &timestamp, 
         for(size_t i_imu = 0; i_imu < vImuMeas.size(); i_imu++)
             mpTracker->GrabImuData(vImuMeas[i_imu]);
 
-    mpTracker->GrabSuper(kpts0_x, kpts0_y, kpts1_x, kpts1_y, timestamp, filename);
+    mpTracker->GrabSuper(kpts, mpts_prev, mpts_curr, timestamp, filename);
+
     // Sophus::SE3f Tcw = mpTracker->GrabSuper(imToFeed,timestamp,filename);
 
     // unique_lock<mutex> lock2(mMutexState);

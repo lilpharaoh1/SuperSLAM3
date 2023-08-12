@@ -382,7 +382,7 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
 }
 
 
-Frame::Frame(const vector<int> kpts0_x, const vector<int> kpts0_y, const vector<int> kpts1_x, const vector<int>kpts1_y, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, GeometricCamera* pCamera, cv::Mat &distCoef, const float &bf, const float &thDepth, Frame* pPrevF, const IMU::Calib &ImuCalib)
+Frame::Frame(const vector<cv::Point2f> kpts, const vector<int> mpts_prev, const vector<int> mpts_curr, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, GeometricCamera* pCamera, cv::Mat &distCoef, const float &bf, const float &thDepth, Frame* pPrevF, const IMU::Calib &ImuCalib)
     :mpcpi(NULL),mpORBvocabulary(voc),mpORBextractorLeft(extractor),mpORBextractorRight(static_cast<ORBextractor*>(NULL)),
      mTimeStamp(timeStamp), mK(static_cast<Pinhole*>(pCamera)->toK()), mK_(static_cast<Pinhole*>(pCamera)->toK_()), mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth),
      mImuCalib(ImuCalib), mpImuPreintegrated(NULL),mpPrevFrame(pPrevF),mpImuPreintegratedFrame(NULL), mpReferenceKF(static_cast<KeyFrame*>(NULL)), mbIsSet(false), mbImuPreintegrated(false), mpCamera(pCamera),
@@ -412,35 +412,44 @@ Frame::Frame(const vector<int> kpts0_x, const vector<int> kpts0_y, const vector<
 // #endif
 
 
-    N = kpts0_x.size();
+    cout << "In Super Frame..." << endl;
+
+    N = kpts.size();
     if(N == 0)
         return;
     mvKeys = vector<cv::KeyPoint>(N);
+    mvKeysUn = vector<cv::KeyPoint>(N);
     mvKeysRight = vector<cv::KeyPoint>(N);
 
     for (int i = 0; i < N; i++) {
-        cv::KeyPoint kpt0, kpt1;
-        kpt0.pt.x = kpts0_x[i];
-        kpt0.pt.y = kpts0_y[i];
-        kpt1.pt.x = kpts1_x[i];
-        kpt1.pt.y = kpts1_y[i];
-        mvKeys.push_back(kpt0);
-        mvKeysRight.push_back(kpt1);
+        cv::KeyPoint pt;
+        pt.pt.x = kpts[i].x;
+        pt.pt.y = kpts[i].y;
+        mvKeys.push_back(pt);
+        mvKeysUn.push_back(pt);
     }
+
+    matches_prev = vector<int>(mpts_prev.size());
+    matches_curr = vector<int>(mpts_curr.size());
+
+    for (int i = 0; i < mpts_curr.size(); i++) {
+        matches_prev.push_back(mpts_prev[i]);
+        matches_curr.push_back(mpts_curr[i]);
+    }    
 
 //     UndistortKeyPoints();
 
     // Set no stereo information
-    mvuRight = vector<float>(N,-1);
-    mvDepth = vector<float>(N,-1);
-    mnCloseMPs = 0;
+    // mvuRight = vector<float>(N,-1);
+    // mvDepth = vector<float>(N,-1);
+    // mnCloseMPs = 0;
 
-    mvpMapPoints = vector<MapPoint*>(N,static_cast<MapPoint*>(NULL));
+    // mvpMapPoints = vector<MapPoint*>(N,static_cast<MapPoint*>(NULL));
 
-    mmProjectPoints.clear();// = map<long unsigned int, cv::Point2f>(N, static_cast<cv::Point2f>(NULL));
-    mmMatchedInImage.clear();
+    // mmProjectPoints.clear();// = map<long unsigned int, cv::Point2f>(N, static_cast<cv::Point2f>(NULL));
+    // mmMatchedInImage.clear();
 
-    mvbOutlier = vector<bool>(N,false);
+    // mvbOutlier = vector<bool>(N,false);
 
     // This is done only for the first Frame (or after a change in the calibration)
 //     if(mbInitialComputations)
@@ -464,29 +473,29 @@ Frame::Frame(const vector<int> kpts0_x, const vector<int> kpts0_y, const vector<
 //     mb = mbf/fx;
 
     //Set no stereo fisheye information
-    Nleft = -1;
-    Nright = -1;
-    mvLeftToRightMatch = vector<int>(0);
-    mvRightToLeftMatch = vector<int>(0);
-    mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
-    monoLeft = -1;
-    monoRight = -1;
+//     Nleft = -1;
+//     Nright = -1;
+//     mvLeftToRightMatch = vector<int>(0);
+//     mvRightToLeftMatch = vector<int>(0);
+//     mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
+//     monoLeft = -1;
+//     monoRight = -1;
 
-//     AssignFeaturesToGrid();
+// //     AssignFeaturesToGrid();
 
-    if(pPrevF)
-    {
-        if(pPrevF->HasVelocity())
-        {
-            SetVelocity(pPrevF->GetVelocity());
-        }
-    }
-    else
-    {
-        mVw.setZero();
-    }
+//     if(pPrevF)
+//     {
+//         if(pPrevF->HasVelocity())
+//         {
+//             SetVelocity(pPrevF->GetVelocity());
+//         }
+//     }
+//     else
+//     {
+//         mVw.setZero();
+//     }
 
-    mpMutexImu = new std::mutex();
+//     mpMutexImu = new std::mutex();
 }
 
 

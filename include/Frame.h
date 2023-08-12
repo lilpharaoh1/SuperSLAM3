@@ -68,7 +68,7 @@ public:
     Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, GeometricCamera* pCamera, cv::Mat &distCoef, const float &bf, const float &thDepth, Frame* pPrevF = static_cast<Frame*>(NULL), const IMU::Calib &ImuCalib = IMU::Calib());
 
     // Constructor for SuperPoints + SuperGlue.
-    Frame(const vector<int> kpts0_x, const vector<int> kpts0_y, const vector<int> kpts1_x, const vector<int>kpts1_y, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, GeometricCamera* pCamera, cv::Mat &distCoef, const float &bf, const float &thDepth, Frame* pPrevF = static_cast<Frame*>(NULL), const IMU::Calib &ImuCalib = IMU::Calib());
+    Frame(const vector<cv::Point2f> kpts, const vector<int> mpts_prev, const vector<int> mpts_curr, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, GeometricCamera* pCamera, cv::Mat &distCoef, const float &bf, const float &thDepth, Frame* pPrevF = static_cast<Frame*>(NULL), const IMU::Calib &ImuCalib = IMU::Calib());
 
     // Destructor
     // ~Frame();
@@ -230,6 +230,9 @@ public:
     // In the RGB-D case, RGB images can be distorted.
     std::vector<cv::KeyPoint> mvKeys, mvKeysRight;
     std::vector<cv::KeyPoint> mvKeysUn;
+
+    // Used by SuperSLAM3
+    std::vector<int> matches_prev, matches_curr;
 
     // Corresponding stereo coordinate and depth for each keypoint.
     std::vector<MapPoint*> mvpMapPoints;

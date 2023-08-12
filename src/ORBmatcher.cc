@@ -759,6 +759,9 @@ namespace ORB_SLAM3
             if(vnMatches12[i1]>=0)
                 vbPrevMatched[i1]=F2.mvKeysUn[vnMatches12[i1]].pt;
 
+        nmatches = F2.matches_curr.size();
+
+
         return nmatches;
     }
 
@@ -874,7 +877,20 @@ namespace ORB_SLAM3
         //Update prev matched
         for(size_t i1=0, iend1=vnMatches12.size(); i1<iend1; i1++)
             if(vnMatches12[i1]>=0)
-                vbPrevMatched[i1]=F2.mvKeysUn[vnMatches12[i1]].pt;
+                vbPrevMatched[i1]=F2.mvKeys[vnMatches12[i1]].pt;
+
+        nmatches = F2.matches_curr.size();
+        vnMatches12 = vector<int>(F1.mvKeysUn.size(),-1);
+
+        // TODO : DO THIS BETTER
+        for (int i = 0; i < F1.mvKeysUn.size(); i++) 
+            vnMatches12[i] = -1;
+        for (int i = 0; i < nmatches; i++)
+            vnMatches12[F2.matches_prev[i]] = F2.matches_curr[i];
+        for(size_t i1=0, iend1=vnMatches12.size(); i1<iend1; i1++)
+            if(vnMatches12[i1]>=0)
+                vbPrevMatched[i1]=F2.mvKeys[vnMatches12[i1]].pt;
+
 
         return nmatches;
     }

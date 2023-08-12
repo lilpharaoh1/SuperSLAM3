@@ -110,23 +110,23 @@ namespace ORB_SLAM3
         threadF.join();
 
         // Compute ratio of scores
-	//cout << "SH : " << SH << endl;
-	//cout << "SF : " << SF << endl;
+	cout << "SH : " << SH << endl;
+	cout << "SF : " << SF << endl;
         if(SH+SF == 0.f) return false;
         float RH = SH/(SH+SF);
-	//cout << "RH : " << RH << endl;
+	cout << "RH : " << RH << endl;
 
         float minParallax = 1.0;
 	
         // Try to reconstruct from homography or fundamental depending on the ratio (0.40-0.45)
         if(RH>0.5) // if(RH>0.40)
         {
-            //cout << "Initialization from Homography" << endl;
+            cout << "Initialization from Homography" << endl;
             return ReconstructH(vbMatchesInliersH,H, mK,T21,vP3D,vbTriangulated,minParallax,50);
         }
         else //if(pF_HF>0.6)
         {
-            //cout << "Initialization from Fundamental" << endl;
+            cout << "Initialization from Fundamental" << endl;
             return ReconstructF(vbMatchesInliersF,F,mK,T21,vP3D,vbTriangulated,minParallax,50);
         }
     }
@@ -519,10 +519,10 @@ namespace ORB_SLAM3
         if(nGood4>0.7*maxGood)
             nsimilar++;
 
-	//cout << "---------------------------------" << endl;
-	//cout << "In ReconstructF..." << endl;
-	//cout << "maxGood<nMinGood : " << (maxGood<nMinGood) << endl;
-	//cout << "nsimilar > 1 : " << (nsimilar>1) << endl;
+	cout << "---------------------------------" << endl;
+	cout << "In ReconstructF..." << endl;
+	cout << "maxGood<nMinGood : " << (maxGood<nMinGood) << endl;
+	cout << "nsimilar > 1 : " << (nsimilar>1) << endl;
 
         // If there is not a clear winner or not enough triangulated points reject initialization
         if(maxGood<nMinGood || nsimilar>1)
@@ -530,17 +530,17 @@ namespace ORB_SLAM3
             return false;
         }
 
-	//cout << "Checking nGoods..." << endl;
-	//cout << "maxGood : " << maxGood << endl;
-	//cout << "nGood1 : " << nGood1 << endl;
-	//cout << "nGood2 : " << nGood2 << endl;
-	//cout << "nGood3 : " << nGood3 << endl;
-	//cout << "nGood4 : " << nGood4 << endl;
-	//cout << "minParallax : " << minParallax << endl;
-	//cout << "parallax1 : " << parallax1 << endl;
-	//cout << "parallax2 : " << parallax2 << endl;
-	//cout << "parallax3 : " << parallax3 << endl;
-	//cout << "parallax4 : " << parallax4 << endl;
+	cout << "Checking nGoods..." << endl;
+	cout << "maxGood : " << maxGood << endl;
+	cout << "nGood1 : " << nGood1 << endl;
+	cout << "nGood2 : " << nGood2 << endl;
+	cout << "nGood3 : " << nGood3 << endl;
+	cout << "nGood4 : " << nGood4 << endl;
+	cout << "minParallax : " << minParallax << endl;
+	cout << "parallax1 : " << parallax1 << endl;
+	cout << "parallax2 : " << parallax2 << endl;
+	cout << "parallax3 : " << parallax3 << endl;
+	cout << "parallax4 : " << parallax4 << endl;
 
         // If best reconstruction has enough parallax initialize
         if(maxGood==nGood1)

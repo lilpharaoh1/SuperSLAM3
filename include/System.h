@@ -122,7 +122,7 @@ public:
 
     // Process SuperGlue Matches and optional imu data
     // TODO: Fill this in later
-    void TrackSuper(const vector<int> kpts0_x, const vector<int> kpts0_y, const vector<int> kpts1_x, const vector<int>kpts1_y, const vector<float> confidences, const double &timestamp,const vector<IMU::Point>& vImuMeas = vector<IMU::Point>(), string filename="");
+    void TrackSuper(const vector<cv::Point2f> kpts, vector<int> mpts_prev, vector<int> mpts_curr, const vector<float> confidences, const double &timestamp,const vector<IMU::Point>& vImuMeas = vector<IMU::Point>(), string filename="");
 
     // This stops local mapping thread (map building) and performs only camera tracking.
     void ActivateLocalizationMode();

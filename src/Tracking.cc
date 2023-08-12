@@ -1614,31 +1614,14 @@ Sophus::SE3f Tracking::GrabImageMonocular(const cv::Mat &im, const double &times
     return mCurrentFrame.GetPose();
 }
 
-void Tracking::GrabSuper(const vector<int> kpts0_x, const vector<int> kpts0_y, const vector<int> kpts1_x, const vector<int>kpts1_y, const double &timestamp, string filename)
+void Tracking::GrabSuper(const vector<cv::Point2f> kpts, const vector<int> mpts_prev, const vector<int> mpts_curr, const double &timestamp, string filename)
 {
-    cout << "In Grab Super..." << endl;
-    mCurrentFrame = Frame(kpts0_x,kpts0_y,kpts1_x,kpts1_y,timestamp,mpIniORBextractor,mpORBVocabulary,mpCamera,mDistCoef,mbf,mThDepth);
-    // if (mSensor == System::MONOCULAR)
-    // {
-    //     if(mState==NOT_INITIALIZED || mState==NO_IMAGES_YET ||(lastID - initID) < mMaxFrames)
-    //         mCurrentFrame = Frame(mImGray,timestamp,mpIniORBextractor,mpORBVocabulary,mpCamera,mDistCoef,mbf,mThDepth);
-    //     else
-    //         mCurrentFrame = Frame(mImGray,timestamp,mpORBextractorLeft,mpORBVocabulary,mpCamera,mDistCoef,mbf,mThDepth);
-    // }
-    // else if(mSensor == System::IMU_MONOCULAR)
-    // {
-    //     if(mState==NOT_INITIALIZED || mState==NO_IMAGES_YET)
-    //     {
-    //         mCurrentFrame = Frame(mImGray,timestamp,mpIniORBextractor,mpORBVocabulary,mpCamera,mDistCoef,mbf,mThDepth,&mLastFrame,*mpImuCalib);
-    //     }
-    //     else
-    //         mCurrentFrame = Frame(mImGray,timestamp,mpORBextractorLeft,mpORBVocabulary,mpCamera,mDistCoef,mbf,mThDepth,&mLastFrame,*mpImuCalib);
-    // }
+    mCurrentFrame = Frame(kpts,mpts_prev,mpts_curr,timestamp,mpIniORBextractor,mpORBVocabulary,mpCamera,mDistCoef,mbf,mThDepth);
 
     // if (mState==NO_IMAGES_YET)
         // t0=timestamp;
 
-    // mCurrentFrame.mNameFile = filename;
+    mCurrentFrame.mNameFile = filename;
     // mCurrentFrame.mnDataset = mnNumDataset;
 
 // #ifdef REGISTER_TIMES
@@ -2494,7 +2477,7 @@ void Tracking::StereoInitialization()
 
 void Tracking::MonocularInitialization()
 {
-
+    cout << "In MonocularInitialization..." << endl;
     if(!mbReadyToInitializate)
     {
         // Set Reference Frame
@@ -2537,7 +2520,7 @@ void Tracking::MonocularInitialization()
         ORBmatcher matcher(0.9,true);
         int nmatches = matcher.SearchForSuperInitialization(mInitialFrame,mCurrentFrame,mvbPrevMatched,mvIniMatches,100);
 
-	//cout << "nmatches in MonocularInitialize : " << nmatches << endl;	
+        cout << "nmatches in MonocularInitialize : " << nmatches << endl;	
 
         // Check if there are enough correspondences
         if(nmatches<100)
@@ -2549,7 +2532,7 @@ void Tracking::MonocularInitialization()
         Sophus::SE3f Tcw;
         vector<bool> vbTriangulated; // Triangulated Correspondences (mvIniMatches)
 
-	//cout << "ReconstructWithTwoView : " << mpCamera->ReconstructWithTwoViews(mInitialFrame.mvKeysUn,mCurrentFrame.mvKeysUn,mvIniMatches,Tcw,mvIniP3D,vbTriangulated) << endl;
+	    cout << "ReconstructWithTwoView : " << mpCamera->ReconstructWithTwoViews(mInitialFrame.mvKeysUn,mCurrentFrame.mvKeysUn,mvIniMatches,Tcw,mvIniP3D,vbTriangulated) << endl;
 
         if(mpCamera->ReconstructWithTwoViews(mInitialFrame.mvKeysUn,mCurrentFrame.mvKeysUn,mvIniMatches,Tcw,mvIniP3D,vbTriangulated))
         {
@@ -2567,6 +2550,30 @@ void Tracking::MonocularInitialization()
             mCurrentFrame.SetPose(Tcw);
 
             CreateInitialMapMonocular();
+        }
+        else {
+            mInitialFrame = Frame(mCurrentFrame);
+            mLastFrame = Frame(mCurrentFrame);
+            mvbPrevMatched.resize(mCurrentFrame.mvKeysUn.size());
+            for(size_t i=0; i<mCurrentFrame.mvKeysUn.size(); i++)
+                mvbPrevMatched[i]=mCurrentFrame.mvKeysUn[i].pt;
+
+            fill(mvIniMatches.begin(),mvIniMatches.end(),-1);
+
+            if (mSensor == System::IMU_MONOCULAR)
+            {
+                if(mpImuPreintegratedFromLastKF)
+                {
+                    delete mpImuPreintegratedFromLastKF;
+                }
+                mpImuPreintegratedFromLastKF = new IMU::Preintegrated(IMU::Bias(),*mpImuCalib);
+                mCurrentFrame.mpImuPreintegrated = mpImuPreintegratedFromLastKF;
+
+            }
+
+            mbReadyToInitializate = true;
+
+            return;
         }
     }
 }

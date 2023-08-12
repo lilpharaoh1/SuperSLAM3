@@ -79,17 +79,24 @@ int main(int argc, char **argv)
 void SuperHandler::GrabMatches(const super_msgs::MatchesStampedPtr& msg)
 {
     const double &timestamp = msg->header.stamp.toSec();
-    vector<int> kpts0_x, kpts0_y, kpts1_x, kpts1_y;
+    vector<cv::Point2f> kpts;
+    vector<int> mpts_prev, mpts_curr;
     vector<float> confidences;
-    for (int i = 0; i < msg->matches.keypoints0.features.size(); i++) { 
-        kpts0_x.push_back(msg->matches.keypoints0.features[i].x);
-        kpts0_y.push_back(msg->matches.keypoints0.features[i].y);
-        kpts1_x.push_back(msg->matches.keypoints1.features[i].x);
-        kpts1_y.push_back(msg->matches.keypoints1.features[i].y);
+
+    cv::Point2f pt;
+    for (int i = 0; i < msg->matches.keypoints.size(); i++) { 
+        pt.x = msg->matches.keypoints[i].x;
+        pt.y = msg->matches.keypoints[i].y;
+        kpts.push_back(pt);
+    }
+
+    for (int i = 0; i < msg->matches.prev.size(); i++) { 
+        mpts_prev.push_back(msg->matches.prev[i]);
+        mpts_curr.push_back(msg->matches.curr[i]);
         confidences.push_back(msg->matches.confidences[i]);
     }
 
-    mpSLAM->TrackSuper(kpts0_x, kpts0_y, kpts1_x, kpts1_y, confidences, timestamp);
+    mpSLAM->TrackSuper(kpts, mpts_prev, mpts_curr, confidences, timestamp);
 }
 
 
