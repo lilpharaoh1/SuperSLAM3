@@ -423,65 +423,63 @@ Frame::Frame(const vector<cv::Point2f> kpts, const vector<int> mpts_prev, const 
         matches_curr[i] = mpts_curr[i];
     }    
 
-//     UndistortKeyPoints();
-
     // Set no stereo information
-    // mvuRight = vector<float>(N,-1);
-    // mvDepth = vector<float>(N,-1);
-    // mnCloseMPs = 0;
+    mvuRight = vector<float>(N,-1);
+    mvDepth = vector<float>(N,-1);
+    mnCloseMPs = 0;
 
-    // mvpMapPoints = vector<MapPoint*>(N,static_cast<MapPoint*>(NULL));
+    mvpMapPoints = vector<MapPoint*>(N,static_cast<MapPoint*>(NULL));
 
-    // mmProjectPoints.clear();// = map<long unsigned int, cv::Point2f>(N, static_cast<cv::Point2f>(NULL));
-    // mmMatchedInImage.clear();
+    mmProjectPoints.clear();// = map<long unsigned int, cv::Point2f>(N, static_cast<cv::Point2f>(NULL));
+    mmMatchedInImage.clear();
 
-    // mvbOutlier = vector<bool>(N,false);
+    mvbOutlier = vector<bool>(N,false);
 
-    // This is done only for the first Frame (or after a change in the calibration)
-//     if(mbInitialComputations)
-//     {
-//         ComputeImageBounds(imGray);
+    // // This is done only for the first Frame (or after a change in the calibration)
+    // if(mbInitialComputations)
+    // {
+    //     // ComputeImageBounds(imGray);
 
-//         mfGridElementWidthInv=static_cast<float>(FRAME_GRID_COLS)/static_cast<float>(mnMaxX-mnMinX);
-//         mfGridElementHeightInv=static_cast<float>(FRAME_GRID_ROWS)/static_cast<float>(mnMaxY-mnMinY);
+    //     mfGridElementWidthInv=static_cast<float>(FRAME_GRID_COLS)/static_cast<float>(mnMaxX-mnMinX);
+    //     mfGridElementHeightInv=static_cast<float>(FRAME_GRID_ROWS)/static_cast<float>(mnMaxY-mnMinY);
 
-//         fx = static_cast<Pinhole*>(mpCamera)->toK().at<float>(0,0);
-//         fy = static_cast<Pinhole*>(mpCamera)->toK().at<float>(1,1);
-//         cx = static_cast<Pinhole*>(mpCamera)->toK().at<float>(0,2);
-//         cy = static_cast<Pinhole*>(mpCamera)->toK().at<float>(1,2);
-//         invfx = 1.0f/fx;
-//         invfy = 1.0f/fy;
+    //     fx = static_cast<Pinhole*>(mpCamera)->toK().at<float>(0,0);
+    //     fy = static_cast<Pinhole*>(mpCamera)->toK().at<float>(1,1);
+    //     cx = static_cast<Pinhole*>(mpCamera)->toK().at<float>(0,2);
+    //     cy = static_cast<Pinhole*>(mpCamera)->toK().at<float>(1,2);
+    //     invfx = 1.0f/fx;
+    //     invfy = 1.0f/fy;
 
-//         mbInitialComputations=false;
-//     }
+    //     mbInitialComputations=false;
+    // }
 
 
-//     mb = mbf/fx;
+    mb = mbf/fx;
 
     //Set no stereo fisheye information
-//     Nleft = -1;
-//     Nright = -1;
-//     mvLeftToRightMatch = vector<int>(0);
-//     mvRightToLeftMatch = vector<int>(0);
-//     mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
-//     monoLeft = -1;
-//     monoRight = -1;
+    Nleft = -1;
+    Nright = -1;
+    mvLeftToRightMatch = vector<int>(0);
+    mvRightToLeftMatch = vector<int>(0);
+    mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
+    monoLeft = -1;
+    monoRight = -1;
 
 // //     AssignFeaturesToGrid();
 
-//     if(pPrevF)
-//     {
-//         if(pPrevF->HasVelocity())
-//         {
-//             SetVelocity(pPrevF->GetVelocity());
-//         }
-//     }
-//     else
-//     {
-//         mVw.setZero();
-//     }
+    if(pPrevF)
+    {
+        if(pPrevF->HasVelocity())
+        {
+            SetVelocity(pPrevF->GetVelocity());
+        }
+    }
+    else
+    {
+        mVw.setZero();
+    }
 
-//     mpMutexImu = new std::mutex();
+    mpMutexImu = new std::mutex();
 }
 
 

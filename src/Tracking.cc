@@ -1631,6 +1631,8 @@ void Tracking::GrabSuper(const vector<cv::Point2f> kpts, const vector<int> mpts_
     lastID = mCurrentFrame.mnId;
     Track();
 
+    cout << "After Track()... ( good job )" << endl;
+
     // return mCurrentFrame.GetPose();
 }
 
@@ -1955,6 +1957,8 @@ void Tracking::Track()
         // System is initialized. Track Frame.
         bool bOK;
 
+    cout << "After Initialization..." << endl;
+
 #ifdef REGISTER_TIMES
         std::chrono::steady_clock::time_point time_StartPosePred = std::chrono::steady_clock::now();
 #endif
@@ -1962,7 +1966,7 @@ void Tracking::Track()
         // Initial camera pose estimation using motion model or relocalization (if tracking is lost)
         if(!mbOnlyTracking)
         {
-
+            cout << "Inside Tracking..." << endl;
             // State OK
             // Local Mapping is activated. This is the normal behaviour, unless
             // you explicitly activate the "only tracking" mode.
@@ -2135,6 +2139,8 @@ void Tracking::Track()
             }
         }
 
+        cout << "After Tracking or Localization..." << endl;
+
         if(!mCurrentFrame.mpReferenceKF)
             mCurrentFrame.mpReferenceKF = mpReferenceKF;
 
@@ -2169,6 +2175,8 @@ void Tracking::Track()
                 bOK = TrackLocalMap();
         }
 
+        cout << "After TrackLocalMap..." << endl; 
+
         if(bOK)
             mState = OK;
         else if (mState == OK)
@@ -2192,6 +2200,8 @@ void Tracking::Track()
                 mTimeStampLost = mCurrentFrame.mTimeStamp;
             //}
         }
+
+        cout << "After bOK..." << endl;
 
         // Save frame if recent relocalization, since they are used for IMU reset (as we are making copy, it shluld be once mCurrFrame is completely modified)
         if((mCurrentFrame.mnId<(mnLastRelocFrameId+mnFramesToResetIMU)) && (mCurrentFrame.mnId > mnFramesToResetIMU) &&
@@ -2219,6 +2229,8 @@ void Tracking::Track()
                     mLastBias = mCurrentFrame.mImuBias;
             }
         }
+
+        cout << "After ImuInitialized..." << endl;
 
 #ifdef REGISTER_TIMES
         std::chrono::steady_clock::time_point time_EndLMTrack = std::chrono::steady_clock::now();
@@ -2297,6 +2309,8 @@ void Tracking::Track()
             }
         }
 
+        cout << "After Drawer..." << endl;
+
         // Reset if the camera get lost soon after initialization
         if(mState==LOST)
         {
@@ -2324,6 +2338,7 @@ void Tracking::Track()
         mLastFrame = Frame(mCurrentFrame);
     }
 
+    cout << "outside init condition..." << endl;
 
 
 
@@ -2332,6 +2347,7 @@ void Tracking::Track()
         // Store frame pose information to retrieve the complete camera trajectory afterwards.
         if(mCurrentFrame.isSet())
         {
+            cout << "mCurrentFrame.isSet() == True..." << endl;
             Sophus::SE3f Tcr_ = mCurrentFrame.GetPose() * mCurrentFrame.mpReferenceKF->GetPoseInverse();
             mlRelativeFramePoses.push_back(Tcr_);
             mlpReferences.push_back(mCurrentFrame.mpReferenceKF);
@@ -2340,6 +2356,7 @@ void Tracking::Track()
         }
         else
         {
+            cout << "mCurrentFrame.isSet() == False..." << endl;
             // This can happen if tracking is lost
             mlRelativeFramePoses.push_back(mlRelativeFramePoses.back());
             mlpReferences.push_back(mlpReferences.back());
@@ -2348,6 +2365,8 @@ void Tracking::Track()
         }
 
     }
+
+    cout << "after OK check..." << endl;
 
 #ifdef REGISTER_LOOP
     if (Stop()) {
@@ -2594,7 +2613,6 @@ void Tracking::CreateInitialMapMonocular()
 
     for(size_t i=0; i<mvIniMatches.size();i++)
     {
-        // cout << "iter " << i << "..." << endl;
         if(mvIniMatches[i]<0)
             continue;
 
@@ -2603,16 +2621,16 @@ void Tracking::CreateInitialMapMonocular()
         worldPos << mvIniP3D[i].x, mvIniP3D[i].y, mvIniP3D[i].z;
         MapPoint* pMP = new MapPoint(worldPos,pKFcur,mpAtlas->GetCurrentMap());
 
-        // cout << "After MapPoint initialized..."
 
         pKFini->AddMapPoint(pMP,i);
         pKFcur->AddMapPoint(pMP,mvIniMatches[i]);
 
+
         pMP->AddObservation(pKFini,i);
         pMP->AddObservation(pKFcur,mvIniMatches[i]);
 
-        pMP->ComputeDistinctiveDescriptors();
         pMP->UpdateNormalAndDepth();
+
 
         //Fill Current Frame structure
         mCurrentFrame.mvpMapPoints[mvIniMatches[i]] = pMP;
@@ -2621,9 +2639,6 @@ void Tracking::CreateInitialMapMonocular()
         //Add to Map
         mpAtlas->AddMapPoint(pMP);
     }
-
-    // cout << "Finished adding map points..." << endl;
-
 
     // Update Connections
     pKFini->UpdateConnections();
@@ -2675,7 +2690,6 @@ void Tracking::CreateInitialMapMonocular()
 
         mpImuPreintegratedFromLastKF = new IMU::Preintegrated(pKFcur->mpImuPreintegrated->GetUpdatedBias(),pKFcur->mImuCalib);
     }
-
 
     mpLocalMapper->InsertKeyFrame(pKFini);
     mpLocalMapper->InsertKeyFrame(pKFcur);

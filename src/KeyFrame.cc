@@ -296,7 +296,7 @@ int KeyFrame::GetNumberMPs()
 
 void KeyFrame::AddMapPoint(MapPoint *pMP, const size_t &idx)
 {
-    unique_lock<mutex> lock(mMutexFeatures);
+    unique_lock<mutex> lock(mMutexFeatures);    
     mvpMapPoints[idx]=pMP;
 }
 
