@@ -2477,7 +2477,6 @@ void Tracking::StereoInitialization()
 
 void Tracking::MonocularInitialization()
 {
-    cout << "In MonocularInitialization..." << endl;
     if(!mbReadyToInitializate)
     {
         // Set Reference Frame
@@ -2520,8 +2519,6 @@ void Tracking::MonocularInitialization()
         ORBmatcher matcher(0.9,true);
         int nmatches = matcher.SearchForSuperInitialization(mInitialFrame,mCurrentFrame,mvbPrevMatched,mvIniMatches,100);
 
-        cout << "nmatches in MonocularInitialize : " << nmatches << endl;	
-
         // Check if there are enough correspondences
         if(nmatches<100)
         {
@@ -2531,8 +2528,6 @@ void Tracking::MonocularInitialization()
 
         Sophus::SE3f Tcw;
         vector<bool> vbTriangulated; // Triangulated Correspondences (mvIniMatches)
-
-	    cout << "ReconstructWithTwoView : " << mpCamera->ReconstructWithTwoViews(mInitialFrame.mvKeysUn,mCurrentFrame.mvKeysUn,mvIniMatches,Tcw,mvIniP3D,vbTriangulated) << endl;
 
         if(mpCamera->ReconstructWithTwoViews(mInitialFrame.mvKeysUn,mCurrentFrame.mvKeysUn,mvIniMatches,Tcw,mvIniP3D,vbTriangulated))
         {
@@ -2599,6 +2594,7 @@ void Tracking::CreateInitialMapMonocular()
 
     for(size_t i=0; i<mvIniMatches.size();i++)
     {
+        // cout << "iter " << i << "..." << endl;
         if(mvIniMatches[i]<0)
             continue;
 
@@ -2606,6 +2602,8 @@ void Tracking::CreateInitialMapMonocular()
         Eigen::Vector3f worldPos;
         worldPos << mvIniP3D[i].x, mvIniP3D[i].y, mvIniP3D[i].z;
         MapPoint* pMP = new MapPoint(worldPos,pKFcur,mpAtlas->GetCurrentMap());
+
+        // cout << "After MapPoint initialized..."
 
         pKFini->AddMapPoint(pMP,i);
         pKFcur->AddMapPoint(pMP,mvIniMatches[i]);
@@ -2623,6 +2621,8 @@ void Tracking::CreateInitialMapMonocular()
         //Add to Map
         mpAtlas->AddMapPoint(pMP);
     }
+
+    // cout << "Finished adding map points..." << endl;
 
 
     // Update Connections

@@ -400,20 +400,6 @@ Frame::Frame(const vector<cv::Point2f> kpts, const vector<int> mpts_prev, const 
     mvLevelSigma2 = mpORBextractorLeft->GetScaleSigmaSquares();
     mvInvLevelSigma2 = mpORBextractorLeft->GetInverseScaleSigmaSquares();
 
-//     // ORB extraction
-// #ifdef REGISTER_TIMES
-//     std::chrono::steady_clock::time_point time_StartExtORB = std::chrono::steady_clock::now();
-// #endif
-//     ExtractORB(0,imGray,0,1000);
-// #ifdef REGISTER_TIMES
-//     std::chrono::steady_clock::time_point time_EndExtORB = std::chrono::steady_clock::now();
-
-//     mTimeORB_Ext = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndExtORB - time_StartExtORB).count();
-// #endif
-
-
-    cout << "In Super Frame..." << endl;
-
     N = kpts.size();
     if(N == 0)
         return;
@@ -425,16 +411,16 @@ Frame::Frame(const vector<cv::Point2f> kpts, const vector<int> mpts_prev, const 
         cv::KeyPoint pt;
         pt.pt.x = kpts[i].x;
         pt.pt.y = kpts[i].y;
-        mvKeys.push_back(pt);
-        mvKeysUn.push_back(pt);
+        mvKeys[i] = pt;
+        mvKeysUn[i] = pt;
     }
 
     matches_prev = vector<int>(mpts_prev.size());
     matches_curr = vector<int>(mpts_curr.size());
 
     for (int i = 0; i < mpts_curr.size(); i++) {
-        matches_prev.push_back(mpts_prev[i]);
-        matches_curr.push_back(mpts_curr[i]);
+        matches_prev[i] = mpts_prev[i];
+        matches_curr[i] = mpts_curr[i];
     }    
 
 //     UndistortKeyPoints();

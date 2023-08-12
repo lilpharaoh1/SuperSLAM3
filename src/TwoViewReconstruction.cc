@@ -110,11 +110,11 @@ namespace ORB_SLAM3
         threadF.join();
 
         // Compute ratio of scores
-	cout << "SH : " << SH << endl;
-	cout << "SF : " << SF << endl;
+	// cout << "SH : " << SH << endl;
+	// cout << "SF : " << SF << endl;
         if(SH+SF == 0.f) return false;
         float RH = SH/(SH+SF);
-	cout << "RH : " << RH << endl;
+	// cout << "RH : " << RH << endl;
 
         float minParallax = 1.0;
 	
@@ -500,6 +500,18 @@ namespace ORB_SLAM3
         vector<bool> vbTriangulated1,vbTriangulated2,vbTriangulated3, vbTriangulated4;
         float parallax1,parallax2, parallax3, parallax4;
 
+        // cout << "mvKeys1" << endl;
+        // for (int i = 0; i < mvKeys1.size(); i++)
+        //     cout << i << " : " << mvKeys1[i].pt.x << " " << mvKeys1[i].pt.y << endl;
+
+        // cout << endl << "mvKeys2" << endl;
+        // for (int i = 0; i < mvKeys2.size(); i++)
+        //     cout << i << " : " << mvKeys2[i].pt.x << " " << mvKeys2[i].pt.y << endl;
+
+        // cout << endl << "mvMatches12" << endl;
+        // for (int i = 0; i < mvMatches12.size(); i++)
+        //     cout << i << " : " << mvMatches12 << endl;
+
         int nGood1 = CheckRT(R1,t1,mvKeys1,mvKeys2,mvMatches12,vbMatchesInliers,K, vP3D1, 4.0*mSigma2, vbTriangulated1, parallax1);
         int nGood2 = CheckRT(R2,t1,mvKeys1,mvKeys2,mvMatches12,vbMatchesInliers,K, vP3D2, 4.0*mSigma2, vbTriangulated2, parallax2);
         int nGood3 = CheckRT(R1,t2,mvKeys1,mvKeys2,mvMatches12,vbMatchesInliers,K, vP3D3, 4.0*mSigma2, vbTriangulated3, parallax3);
@@ -519,10 +531,18 @@ namespace ORB_SLAM3
         if(nGood4>0.7*maxGood)
             nsimilar++;
 
-	cout << "---------------------------------" << endl;
-	cout << "In ReconstructF..." << endl;
-	cout << "maxGood<nMinGood : " << (maxGood<nMinGood) << endl;
-	cout << "nsimilar > 1 : " << (nsimilar>1) << endl;
+	// cout << "---------------------------------" << endl;
+	// cout << "In ReconstructF..." << endl;
+	// cout << "maxGood<nMinGood : " << (maxGood<nMinGood) << endl;
+	// cout << "nsimilar > 1 : " << (nsimilar>1) << endl;
+
+    // cout << "Checking nGoods..." << endl;
+    // cout << "nMinGood : " << nMinGood << endl;
+	// cout << "maxGood : " << maxGood << endl;
+	// cout << "nGood1 : " << nGood1 << endl;
+	// cout << "nGood2 : " << nGood2 << endl;
+	// cout << "nGood3 : " << nGood3 << endl;
+	// cout << "nGood4 : " << nGood4 << endl;
 
         // If there is not a clear winner or not enough triangulated points reject initialization
         if(maxGood<nMinGood || nsimilar>1)
@@ -530,17 +550,17 @@ namespace ORB_SLAM3
             return false;
         }
 
-	cout << "Checking nGoods..." << endl;
-	cout << "maxGood : " << maxGood << endl;
-	cout << "nGood1 : " << nGood1 << endl;
-	cout << "nGood2 : " << nGood2 << endl;
-	cout << "nGood3 : " << nGood3 << endl;
-	cout << "nGood4 : " << nGood4 << endl;
-	cout << "minParallax : " << minParallax << endl;
-	cout << "parallax1 : " << parallax1 << endl;
-	cout << "parallax2 : " << parallax2 << endl;
-	cout << "parallax3 : " << parallax3 << endl;
-	cout << "parallax4 : " << parallax4 << endl;
+	// cout << "Checking nGoods..." << endl;
+	// cout << "maxGood : " << maxGood << endl;
+	// cout << "nGood1 : " << nGood1 << endl; 
+	// cout << "nGood2 : " << nGood2 << endl;
+	// cout << "nGood3 : " << nGood3 << endl;
+	// cout << "nGood4 : " << nGood4 << endl;
+	// cout << "minParallax : " << minParallax << endl;
+	// cout << "parallax1 : " << parallax1 << endl;
+	// cout << "parallax2 : " << parallax2 << endl;
+	// cout << "parallax3 : " << parallax3 << endl;
+	// cout << "parallax4 : " << parallax4 << endl;
 
         // If best reconstruction has enough parallax initialize
         if(maxGood==nGood1)
