@@ -1617,6 +1617,7 @@ Sophus::SE3f Tracking::GrabImageMonocular(const cv::Mat &im, const double &times
 void Tracking::GrabSuper(const vector<cv::Point2f> kpts, const vector<int> mpts_prev, const vector<int> mpts_curr, const double &timestamp, string filename)
 {
     mCurrentFrame = Frame(kpts,mpts_prev,mpts_curr,timestamp,mpIniORBextractor,mpORBVocabulary,mpCamera,mDistCoef,mbf,mThDepth);
+    cout << "After Frame..." << endl;
 
     // if (mState==NO_IMAGES_YET)
         // t0=timestamp;
@@ -1848,6 +1849,7 @@ void Tracking::Track()
 
     if(mState!=NO_IMAGES_YET)
     {
+        cout << "mState != NO_IMAGES_YET ..." << endl;
         if(mLastFrame.mTimeStamp>mCurrentFrame.mTimeStamp)
         {
             cerr << "ERROR: Frame with a timestamp older than previous frame detected!" << endl;

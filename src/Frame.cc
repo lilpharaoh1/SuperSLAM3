@@ -435,25 +435,6 @@ Frame::Frame(const vector<cv::Point2f> kpts, const vector<int> mpts_prev, const 
 
     mvbOutlier = vector<bool>(N,false);
 
-    // // This is done only for the first Frame (or after a change in the calibration)
-    // if(mbInitialComputations)
-    // {
-    //     // ComputeImageBounds(imGray);
-
-    //     mfGridElementWidthInv=static_cast<float>(FRAME_GRID_COLS)/static_cast<float>(mnMaxX-mnMinX);
-    //     mfGridElementHeightInv=static_cast<float>(FRAME_GRID_ROWS)/static_cast<float>(mnMaxY-mnMinY);
-
-    //     fx = static_cast<Pinhole*>(mpCamera)->toK().at<float>(0,0);
-    //     fy = static_cast<Pinhole*>(mpCamera)->toK().at<float>(1,1);
-    //     cx = static_cast<Pinhole*>(mpCamera)->toK().at<float>(0,2);
-    //     cy = static_cast<Pinhole*>(mpCamera)->toK().at<float>(1,2);
-    //     invfx = 1.0f/fx;
-    //     invfy = 1.0f/fy;
-
-    //     mbInitialComputations=false;
-    // }
-
-
     mb = mbf/fx;
 
     //Set no stereo fisheye information
@@ -469,10 +450,14 @@ Frame::Frame(const vector<cv::Point2f> kpts, const vector<int> mpts_prev, const 
 
     if(pPrevF)
     {
+        cout << "In pPrevF condition..." << endl;
         if(pPrevF->HasVelocity())
         {
+            cout << "Before set Velocity..." << endl;
             SetVelocity(pPrevF->GetVelocity());
         }
+        cout << "After SetVelocity condition..." << endl;
+
     }
     else
     {
@@ -840,6 +825,7 @@ void Frame::ComputeBoW()
 {
     if(mBowVec.empty())
     {
+        cout << "In ComputeBoW..." << endl;
         vector<cv::Mat> vCurrentDesc = Converter::toDescriptorVector(mDescriptors);
         mpORBvocabulary->transform(vCurrentDesc,mBowVec,mFeatVec,4);
     }
