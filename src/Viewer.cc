@@ -318,25 +318,25 @@ void Viewer::Run()
         pangolin::FinishFrame();
 
         cv::Mat toShow;
-        cv::Mat im = mpFrameDrawer->DrawFrame(trackedImageScale);
+        // cv::Mat im = mpFrameDrawer->DrawFrame(trackedImageScale);
 
-        if(both){
-            cv::Mat imRight = mpFrameDrawer->DrawRightFrame(trackedImageScale);
-            cv::hconcat(im,imRight,toShow);
-        }
-        else{
-            toShow = im;
-        }
+        // if(both){
+            // cv::Mat imRight = mpFrameDrawer->DrawRightFrame(trackedImageScale);
+            // cv::hconcat(im,imRight,toShow);
+        // }
+        // else{
+            // toShow = im;
+        // }
 
-        if(mImageViewerScale != 1.f)
-        {
-            int width = toShow.cols * mImageViewerScale;
-            int height = toShow.rows * mImageViewerScale;
-            cv::resize(toShow, toShow, cv::Size(width, height));
-        }
-
-        cv::imshow("ORB-SLAM3: Current Frame",toShow);
-        cv::waitKey(mT);
+        // if(mImageViewerScale != 1.f)
+        // {
+            // int width = toShow.cols * mImageViewerScale;
+            // int height = toShow.rows * mImageViewerScale;
+            // cv::resize(toShow, toShow, cv::Size(width, height));
+        // }
+// 
+        // cv::imshow("ORB-SLAM3: Current Frame",toShow);
+        // cv::waitKey(mT);
 
         if(menuReset)
         {

@@ -69,7 +69,6 @@ void LocalMapping::Run()
     {
         // Tracking will see that Local Mapping is busy
         SetAcceptKeyFrames(false);
-        cout << "After SetAcceptKeyFrames(false)..." << endl;
 
         // Check if there are keyframes in the queue
         if(CheckNewKeyFrames() && !mbBadImu)
@@ -80,7 +79,6 @@ void LocalMapping::Run()
 
             std::chrono::steady_clock::time_point time_StartProcessKF = std::chrono::steady_clock::now();
 #endif
-            cout << "In CheckNewKeyFrames()..." << endl;
             // BoW conversion and insertion in Map
             ProcessNewKeyFrame();
 #ifdef REGISTER_TIMES
@@ -92,7 +90,6 @@ void LocalMapping::Run()
 
             // Check recent MapPoints
             MapPointCulling();
-            cout << "After MapPointCulling()..." << endl;
 #ifdef REGISTER_TIMES
             std::chrono::steady_clock::time_point time_EndMPCulling = std::chrono::steady_clock::now();
 
@@ -102,7 +99,6 @@ void LocalMapping::Run()
 
             // Triangulate new MapPoints
             CreateNewMapPoints();
-            cout << "After CreateNewMapPoints()..." << endl;
 
             mbAbortBA = false;
 
@@ -111,8 +107,6 @@ void LocalMapping::Run()
                 // Find more matches in neighbor keyframes and fuse point duplications
                 SearchInNeighbors();
             }
-
-            cout << "After SearchInNeighbors..." << endl;
 
 #ifdef REGISTER_TIMES
             std::chrono::steady_clock::time_point time_EndMPCreation = std::chrono::steady_clock::now();
@@ -143,7 +137,6 @@ void LocalMapping::Run()
                         {
                             if((mTinit<10.f) && (dist<0.02))
                             {
-                                cout << "Not enough motion for initializing. Reseting..." << endl;
                                 unique_lock<mutex> lock(mMutexReset);
                                 mbResetRequestedActiveMap = true;
                                 mpMapToReset = mpCurrentKeyFrame->GetMap();
@@ -248,16 +241,12 @@ void LocalMapping::Run()
                 }
             }
 
-            cout << "After big if..." << endl;
-
 #ifdef REGISTER_TIMES
             vdLBASync_ms.push_back(timeKFCulling_ms);
             vdKFCullingSync_ms.push_back(timeKFCulling_ms);
 #endif
 
             mpLoopCloser->InsertKeyFrame(mpCurrentKeyFrame);
-
-            cout << "After mpLoopCloser->InsertKeyFrame..." << endl;
 
 #ifdef REGISTER_TIMES
             std::chrono::steady_clock::time_point time_EndLocalMap = std::chrono::steady_clock::now();
@@ -281,7 +270,6 @@ void LocalMapping::Run()
 
         // Tracking will see that Local Mapping is busy
         SetAcceptKeyFrames(true);
-        cout << "After SetAcceptKeyFrames(true)..." << endl;
 
         if(CheckFinish())
             break;
@@ -724,7 +712,6 @@ void LocalMapping::CreateNewMapPoints()
 
 void LocalMapping::SearchInNeighbors()
 {
-    cout << "In SearchInNeighbors..." << endl;
     // Retrieve neighbor keyframes
     int nn = 10;
     if(mbMonocular)
@@ -739,8 +726,6 @@ void LocalMapping::SearchInNeighbors()
         vpTargetKFs.push_back(pKFi);
         pKFi->mnFuseTargetForKF = mpCurrentKeyFrame->mnId;
     }
-
-    cout << "After Retrieve neighbor keyframes..." << endl;
 
     // Add some covisible of covisible
     // Extend to some second neighbors if abort is not requested
@@ -759,8 +744,6 @@ void LocalMapping::SearchInNeighbors()
             break;
     }
 
-    cout << "After Extend to some second neighbors if abort is not requested..." << endl;
-
     // Extend to temporal neighbors
     if(mbInertial)
     {
@@ -778,8 +761,6 @@ void LocalMapping::SearchInNeighbors()
         }
     }
 
-    cout << "After Extend to temporal neighbors..." << endl;
-
     // Search matches by projection from current KF in target KFs
     ORBmatcher matcher;
     vector<MapPoint*> vpMapPointMatches = mpCurrentKeyFrame->GetMapPointMatches();
@@ -794,8 +775,6 @@ void LocalMapping::SearchInNeighbors()
 
     if (mbAbortBA)
         return;
-
-    cout << "After Search matches by projecttion from current KF in target KFs..." << endl;
 
     // Search matches by projection from target KFs in current KF
     vector<MapPoint*> vpFuseCandidates;
@@ -822,33 +801,23 @@ void LocalMapping::SearchInNeighbors()
     matcher.Fuse(mpCurrentKeyFrame,vpFuseCandidates);
     if(mpCurrentKeyFrame->NLeft != -1) matcher.Fuse(mpCurrentKeyFrame,vpFuseCandidates,true);
 
-    cout << "After Search matches by projection from target KFs in current KF..." << endl;
-
     // Update points
     vpMapPointMatches = mpCurrentKeyFrame->GetMapPointMatches();
-    cout << "After GetMapPointMatches" << endl;
-    cout << "vpMapPointMatches.size() = " << vpMapPointMatches.size() << endl;
     for(size_t i=0, iend=vpMapPointMatches.size(); i<iend; i++)
     {
-        cout << "iter : " << i << endl;
         MapPoint* pMP=vpMapPointMatches[i];
         if(pMP)
         {
             if(!pMP->isBad())
             {
-                cout << "in condition..." << endl;
                 // pMP->ComputeDistinctiveDescriptors();
                 pMP->UpdateNormalAndDepth();
-                cout << "after condition..." << endl;
             }
         }
     }
 
-    cout << "After Update points..." << endl;
-
     // Update connections in covisibility graph
     mpCurrentKeyFrame->UpdateConnections();
-    cout << "End of SearchInNeighbors()..." << endl;
 }
 
 void LocalMapping::RequestStop()

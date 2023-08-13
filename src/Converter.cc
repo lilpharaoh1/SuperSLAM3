@@ -50,14 +50,12 @@ g2o::SE3Quat Converter::toSE3Quat(const Sophus::SE3f &T)
 
 cv::Mat Converter::toCvMat(const g2o::SE3Quat &SE3)
 {
-    std::cout << "In converter..." << std::endl;
     Eigen::Matrix<double,4,4> eigMat = SE3.to_homogeneous_matrix();
     return toCvMat(eigMat);
 }
 
 cv::Mat Converter::toCvMat(const g2o::Sim3 &Sim3)
 {
-    std::cout << "In converter..." << std::endl;
     Eigen::Matrix3d eigR = Sim3.rotation().toRotationMatrix();
     Eigen::Vector3d eigt = Sim3.translation();
     double s = Sim3.scale();
@@ -66,7 +64,6 @@ cv::Mat Converter::toCvMat(const g2o::Sim3 &Sim3)
 
 cv::Mat Converter::toCvMat(const Eigen::Matrix<double,4,4> &m)
 {
-    std::cout << "In converter..." << std::endl;
     cv::Mat cvMat(4,4,CV_32F);
     for(int i=0;i<4;i++)
         for(int j=0; j<4; j++)
@@ -77,7 +74,6 @@ cv::Mat Converter::toCvMat(const Eigen::Matrix<double,4,4> &m)
 
 cv::Mat Converter::toCvMat(const Eigen::Matrix<float,4,4> &m)
 {
-    std::cout << "In converter..." << std::endl;
     cv::Mat cvMat(4,4,CV_32F);
     for(int i=0;i<4;i++)
         for(int j=0; j<4; j++)
@@ -88,7 +84,6 @@ cv::Mat Converter::toCvMat(const Eigen::Matrix<float,4,4> &m)
 
 cv::Mat Converter::toCvMat(const Eigen::Matrix<float,3,4> &m)
 {
-    std::cout << "In converter..." << std::endl;
     cv::Mat cvMat(3,4,CV_32F);
     for(int i=0;i<3;i++)
         for(int j=0; j<4; j++)
@@ -99,7 +94,6 @@ cv::Mat Converter::toCvMat(const Eigen::Matrix<float,3,4> &m)
 
 cv::Mat Converter::toCvMat(const Eigen::Matrix3d &m)
 {
-    std::cout << "In converter..." << std::endl;
     cv::Mat cvMat(3,3,CV_32F);
     for(int i=0;i<3;i++)
         for(int j=0; j<3; j++)
@@ -110,7 +104,6 @@ cv::Mat Converter::toCvMat(const Eigen::Matrix3d &m)
 
 cv::Mat Converter::toCvMat(const Eigen::Matrix3f &m)
 {
-    std::cout << "In converter..." << std::endl;
     cv::Mat cvMat(3,3,CV_32F);
     for(int i=0;i<3;i++)
         for(int j=0; j<3; j++)
@@ -121,7 +114,6 @@ cv::Mat Converter::toCvMat(const Eigen::Matrix3f &m)
 
 cv::Mat Converter::toCvMat(const Eigen::MatrixXf &m)
 {
-    std::cout << "In converter..." << std::endl;
     cv::Mat cvMat(m.rows(),m.cols(),CV_32F);
     for(int i=0;i<m.rows();i++)
         for(int j=0; j<m.cols(); j++)
@@ -132,7 +124,6 @@ cv::Mat Converter::toCvMat(const Eigen::MatrixXf &m)
 
 cv::Mat Converter::toCvMat(const Eigen::MatrixXd &m)
 {
-    std::cout << "In converter..." << std::endl;
     cv::Mat cvMat(m.rows(),m.cols(),CV_32F);
     for(int i=0;i<m.rows();i++)
         for(int j=0; j<m.cols(); j++)
@@ -143,7 +134,6 @@ cv::Mat Converter::toCvMat(const Eigen::MatrixXd &m)
 
 cv::Mat Converter::toCvMat(const Eigen::Matrix<double,3,1> &m)
 {
-    std::cout << "In converter..." << std::endl;
     cv::Mat cvMat(3,1,CV_32F);
     for(int i=0;i<3;i++)
             cvMat.at<float>(i)=m(i);
@@ -153,7 +143,6 @@ cv::Mat Converter::toCvMat(const Eigen::Matrix<double,3,1> &m)
 
 cv::Mat Converter::toCvMat(const Eigen::Matrix<float,3,1> &m)
 {
-    std::cout << "In converter..." << std::endl;
     cv::Mat cvMat(3,1,CV_32F);
     for(int i=0;i<3;i++)
         cvMat.at<float>(i)=m(i);
@@ -163,7 +152,6 @@ cv::Mat Converter::toCvMat(const Eigen::Matrix<float,3,1> &m)
 
 cv::Mat Converter::toCvSE3(const Eigen::Matrix<double,3,3> &R, const Eigen::Matrix<double,3,1> &t)
 {
-    std::cout << "In converter..." << std::endl;
     cv::Mat cvMat = cv::Mat::eye(4,4,CV_32F);
     for(int i=0;i<3;i++)
     {

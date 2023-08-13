@@ -450,14 +450,10 @@ Frame::Frame(const vector<cv::Point2f> kpts, const vector<int> mpts_prev, const 
 
     if(pPrevF)
     {
-        cout << "In pPrevF condition..." << endl;
         if(pPrevF->HasVelocity())
         {
-            cout << "Before set Velocity..." << endl;
             SetVelocity(pPrevF->GetVelocity());
         }
-        cout << "After SetVelocity condition..." << endl;
-
     }
     else
     {
@@ -825,7 +821,6 @@ void Frame::ComputeBoW()
 {
     if(mBowVec.empty())
     {
-        cout << "In ComputeBoW..." << endl;
         vector<cv::Mat> vCurrentDesc = Converter::toDescriptorVector(mDescriptors);
         mpORBvocabulary->transform(vCurrentDesc,mBowVec,mFeatVec,4);
     }
