@@ -2638,13 +2638,6 @@ void Tracking::SuperTrack()
                 mpSystem->ResetActiveMap();
                 return;
             }
-            if (mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO || mSensor == System::IMU_RGBD)
-                if (!pCurrentMap->isImuInitialized())
-                {
-                    Verbose::PrintMess("Track lost before IMU initialisation, reseting...", Verbose::VERBOSITY_QUIET);
-                    mpSystem->ResetActiveMap();
-                    return;
-                }
 
             CreateMapInAtlas();
 
@@ -3468,6 +3461,9 @@ bool Tracking::TrackLocalSuperMap()
                 aux2++;
         }
 
+    cout << "aux1 : " << aux1 << endl;
+    cout << "aux2 : " << aux2 << endl;
+
     int inliers;
     if (!mpAtlas->isImuInitialized())
         Optimizer::PoseOptimization(&mCurrentFrame);
@@ -3503,6 +3499,9 @@ bool Tracking::TrackLocalSuperMap()
                 aux2++;
         }
 
+    cout << "aux1 : " << aux1 << endl;
+    cout << "aux2 : " << aux2 << endl;
+
     mnMatchesInliers = 0;
 
     // Update MapPoints Statistics
@@ -3516,8 +3515,13 @@ bool Tracking::TrackLocalSuperMap()
                 if(mCurrentFrame.mvpMapPoints[i]->Observations()>0)
                     mnMatchesInliers++;
             }
+            else {
+                cout << "outlier..." << endl; 
+            }
         }
     }
+
+    cout << "mnMatchesInliers : " << mnMatchesInliers << endl; 
 
     // Decide if the tracking was succesful
     // More restrictive if there was a relocalization recently
