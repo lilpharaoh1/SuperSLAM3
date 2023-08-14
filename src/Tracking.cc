@@ -1631,8 +1631,6 @@ void Tracking::GrabSuper(const vector<cv::Point2f> kpts, const vector<int> mpts_
     lastID = mCurrentFrame.mnId;
     Track();
 
-    cout << "After Track()... ( good job )" << endl;
-
     // return mCurrentFrame.GetPose();
 }
 
@@ -1848,6 +1846,7 @@ void Tracking::Track()
 
     if(mState!=NO_IMAGES_YET)
     {
+        cout << "mState != NO_IMAGES_YET ..." << endl;
         if(mLastFrame.mTimeStamp>mCurrentFrame.mTimeStamp)
         {
             cerr << "ERROR: Frame with a timestamp older than previous frame detected!" << endl;
@@ -1956,8 +1955,6 @@ void Tracking::Track()
     {
         // System is initialized. Track Frame.
         bool bOK;
-
-    cout << "After Initialization..." << endl;
 
 #ifdef REGISTER_TIMES
         std::chrono::steady_clock::time_point time_StartPosePred = std::chrono::steady_clock::now();
@@ -2139,8 +2136,6 @@ void Tracking::Track()
             }
         }
 
-        cout << "After Tracking or Localization..." << endl;
-
         if(!mCurrentFrame.mpReferenceKF)
             mCurrentFrame.mpReferenceKF = mpReferenceKF;
 
@@ -2175,8 +2170,6 @@ void Tracking::Track()
                 bOK = TrackLocalMap();
         }
 
-        cout << "After TrackLocalMap..." << endl; 
-
         if(bOK)
             mState = OK;
         else if (mState == OK)
@@ -2200,8 +2193,6 @@ void Tracking::Track()
                 mTimeStampLost = mCurrentFrame.mTimeStamp;
             //}
         }
-
-        cout << "After bOK..." << endl;
 
         // Save frame if recent relocalization, since they are used for IMU reset (as we are making copy, it shluld be once mCurrFrame is completely modified)
         if((mCurrentFrame.mnId<(mnLastRelocFrameId+mnFramesToResetIMU)) && (mCurrentFrame.mnId > mnFramesToResetIMU) &&
@@ -2229,8 +2220,6 @@ void Tracking::Track()
                     mLastBias = mCurrentFrame.mImuBias;
             }
         }
-
-        cout << "After ImuInitialized..." << endl;
 
 #ifdef REGISTER_TIMES
         std::chrono::steady_clock::time_point time_EndLMTrack = std::chrono::steady_clock::now();
@@ -2309,8 +2298,6 @@ void Tracking::Track()
             }
         }
 
-        cout << "After Drawer..." << endl;
-
         // Reset if the camera get lost soon after initialization
         if(mState==LOST)
         {
@@ -2365,8 +2352,6 @@ void Tracking::Track()
         }
 
     }
-
-    cout << "after OK check..." << endl;
 
 #ifdef REGISTER_LOOP
     if (Stop()) {

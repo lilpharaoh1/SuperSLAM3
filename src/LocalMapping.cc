@@ -137,7 +137,6 @@ void LocalMapping::Run()
                         {
                             if((mTinit<10.f) && (dist<0.02))
                             {
-                                cout << "Not enough motion for initializing. Reseting..." << endl;
                                 unique_lock<mutex> lock(mMutexReset);
                                 mbResetRequestedActiveMap = true;
                                 mpMapToReset = mpCurrentKeyFrame->GetMap();
@@ -802,7 +801,6 @@ void LocalMapping::SearchInNeighbors()
     matcher.Fuse(mpCurrentKeyFrame,vpFuseCandidates);
     if(mpCurrentKeyFrame->NLeft != -1) matcher.Fuse(mpCurrentKeyFrame,vpFuseCandidates,true);
 
-
     // Update points
     vpMapPointMatches = mpCurrentKeyFrame->GetMapPointMatches();
     for(size_t i=0, iend=vpMapPointMatches.size(); i<iend; i++)
@@ -812,7 +810,7 @@ void LocalMapping::SearchInNeighbors()
         {
             if(!pMP->isBad())
             {
-                pMP->ComputeDistinctiveDescriptors();
+                // pMP->ComputeDistinctiveDescriptors();
                 pMP->UpdateNormalAndDepth();
             }
         }

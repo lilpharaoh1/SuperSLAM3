@@ -211,7 +211,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     //Initialize the Loop Closing thread and launch
     // mSensor!=MONOCULAR && mSensor!=IMU_MONOCULAR
     mpLoopCloser = new LoopClosing(mpAtlas, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR, activeLC); // mSensor!=MONOCULAR);
-    mptLoopClosing = new thread(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
+    // mptLoopClosing = new thread(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
 
     //Set pointers between threads
     mpTracker->SetLocalMapper(mpLocalMapper);
@@ -475,7 +475,6 @@ Sophus::SE3f System::TrackMonocular(const cv::Mat &im, const double &timestamp, 
 
     void System::TrackSuper(const vector<cv::Point2f> kpts, vector<int> mpts_prev, vector<int> mpts_curr, const vector<float> confidences, const double &timestamp, const vector<IMU::Point>& vImuMeas, string filename)
 {
-
     {
         unique_lock<mutex> lock(mMutexReset);
         // if(mbShutDown)
