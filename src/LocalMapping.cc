@@ -69,6 +69,7 @@ void LocalMapping::Run()
     {
         // Tracking will see that Local Mapping is busy
         SetAcceptKeyFrames(false);
+        // cout << "After SetAcceptKeyFrames(false)..." << endl;
 
         // Check if there are keyframes in the queue
         if(CheckNewKeyFrames() && !mbBadImu)
@@ -90,6 +91,8 @@ void LocalMapping::Run()
 
             // Check recent MapPoints
             MapPointCulling();
+
+            // cout << "After MapPointCulling..." << endl;
 #ifdef REGISTER_TIMES
             std::chrono::steady_clock::time_point time_EndMPCulling = std::chrono::steady_clock::now();
 
@@ -100,12 +103,15 @@ void LocalMapping::Run()
             // Triangulate new MapPoints
             CreateNewMapPoints();
 
+            // cout << "After CreateNewMapPoints..." << endl;
+
             mbAbortBA = false;
 
             if(!CheckNewKeyFrames())
             {
                 // Find more matches in neighbor keyframes and fuse point duplications
                 SearchInNeighbors();
+                // cout << "After SearchInNeighbours..." << endl;
             }
 
 #ifdef REGISTER_TIMES
@@ -189,6 +195,8 @@ void LocalMapping::Run()
                 // Check redundant local Keyframes
                 KeyFrameCulling();
 
+                // cout << "After KeyFrameCulling..." << endl;
+
 #ifdef REGISTER_TIMES
                 std::chrono::steady_clock::time_point time_EndKFCulling = std::chrono::steady_clock::now();
 
@@ -248,6 +256,8 @@ void LocalMapping::Run()
 
             mpLoopCloser->InsertKeyFrame(mpCurrentKeyFrame);
 
+            // cout << "After InsertKeyFrame..." << endl;
+
 #ifdef REGISTER_TIMES
             std::chrono::steady_clock::time_point time_EndLocalMap = std::chrono::steady_clock::now();
 
@@ -270,6 +280,7 @@ void LocalMapping::Run()
 
         // Tracking will see that Local Mapping is busy
         SetAcceptKeyFrames(true);
+        // cout << "After SetAcceptKeyFrames(true)..." << endl;
 
         if(CheckFinish())
             break;
@@ -319,7 +330,7 @@ void LocalMapping::ProcessNewKeyFrame()
                 {
                     pMP->AddObservation(mpCurrentKeyFrame, i);
                     pMP->UpdateNormalAndDepth();
-                    pMP->ComputeDistinctiveDescriptors();
+                    // pMP->ComputeDistinctiveDescriptors();
                 }
                 else // this can only happen for new stereo points inserted by the Tracking
                 {

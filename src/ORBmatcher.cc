@@ -224,6 +224,8 @@ namespace ORB_SLAM3
     {
         const vector<MapPoint*> vpMapPointsKF = pKF->GetMapPointMatches();
 
+        cout << "vpMapPointsKF.size() = " << vpMapPointsKF.size() << endl;
+
         vpMapPointMatches = vector<MapPoint*>(F.N,static_cast<MapPoint*>(NULL));
 
         const DBoW2::FeatureVector &vFeatVecKF = pKF->mFeatVec;
@@ -420,6 +422,21 @@ namespace ORB_SLAM3
                 }
             }
         }
+
+        return nmatches;
+    }
+
+    int ORBmatcher::SearchBySuperBoW(KeyFrame* pKF,Frame &F, vector<MapPoint*> &vpMapPointMatches)
+    {
+        int nmatches=0;        
+        const vector<MapPoint*> vpMapPointsKF = pKF->GetMapPointMatches();
+        cout << "vpMapPointsKF.size() = " << vpMapPointsKF.size() << endl;
+        vpMapPointMatches = vector<MapPoint*>(F.N,static_cast<MapPoint*>(NULL));
+
+        for(int i = 0; i < F.matches_prev.size(); i++)
+            vpMapPointMatches[F.matches_curr[i]] = vpMapPointsKF[F.matches_prev[i]];
+
+        nmatches = F.matches_curr.size();
 
         return nmatches;
     }
