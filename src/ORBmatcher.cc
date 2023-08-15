@@ -430,11 +430,19 @@ namespace ORB_SLAM3
     {
         int nmatches=0;        
         const vector<MapPoint*> vpMapPointsKF = pKF->GetMapPointMatches();
+        
         cout << "vpMapPointsKF.size() = " << vpMapPointsKF.size() << endl;
+        cout << "F.matches_curr.size() = " << F.matches_curr.size() << endl;
+
+        cout << "pKF.mvKeysUn.size() = " << pKF->mvKeysUn.size() << endl;
+        cout << "F.matches_prev.size() = " << F.matches_prev.size() << endl;
+
+
         vpMapPointMatches = vector<MapPoint*>(F.N,static_cast<MapPoint*>(NULL));
 
-        for(int i = 0; i < F.matches_prev.size(); i++)
+        for(int i = 0; i < F.matches_prev.size(); i++) {
             vpMapPointMatches[F.matches_curr[i]] = vpMapPointsKF[F.matches_prev[i]];
+        }
 
         nmatches = F.matches_curr.size();
 

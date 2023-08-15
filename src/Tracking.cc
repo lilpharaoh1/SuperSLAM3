@@ -1954,7 +1954,6 @@ void Tracking::Track()
         // Initial camera pose estimation using motion model or relocalization (if tracking is lost)
         if(!mbOnlyTracking)
         {
-            cout << "Inside Tracking..." << endl;
             // State OK
             // Local Mapping is activated. This is the normal behaviour, unless
             // you explicitly activate the "only tracking" mode.
@@ -3107,6 +3106,8 @@ bool Tracking::TrackReferenceKeyFrame()
 
     int nmatches = matcher.SearchBySuperBoW(mpReferenceKF,mCurrentFrame,vpMapPointMatches);
 
+    cout << " # of Map Points after SearchBySuperBoW : " << mCurrentFrame.mvpMapPoints.size() << endl;
+
     if(nmatches<15)
     {
         cout << "TRACK_REF_KF: Less than 15 matches!!\n";
@@ -3150,7 +3151,11 @@ bool Tracking::TrackReferenceKeyFrame()
         }
     }
 
+    nmatchesMap = mCurrentFrame.matches_curr.size();
+
     cout << "nmatchesMap = " << nmatchesMap << endl;
+
+    cout << "# of Map Points at the end of TrackReferenceKeyFrame : " << mCurrentFrame.mvpMapPoints.size() << endl;
 
     if (mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO || mSensor == System::IMU_RGBD)
         return true;
@@ -3335,7 +3340,7 @@ bool Tracking::TrackLocalMap()
 
     UpdateLocalMap();
     SearchLocalPoints();
-
+    
     // TOO check outliers before PO
     int aux1 = 0, aux2=0;
     for(int i=0; i<mCurrentFrame.N; i++)
@@ -3407,11 +3412,15 @@ bool Tracking::TrackLocalMap()
     // Decide if the tracking was succesful
     // More restrictive if there was a relocalization recently
     mpLocalMapper->mnMatchesInliers=mnMatchesInliers;
-    if(mCurrentFrame.mnId<mnLastRelocFrameId+mMaxFrames && mnMatchesInliers<50)
+    if(mCurrentFrame.mnId<mnLastRelocFrameId+mMaxFrames && mnMatchesInliers<50) {
+        cout << "Exiting False from Relocalization" << endl;
         return false;
+    }
 
-    if((mnMatchesInliers>10)&&(mState==RECENTLY_LOST))
+    if((mnMatchesInliers>10)&&(mState==RECENTLY_LOST)) {
+        cout << "Exiting True from Recently Lost condition" << endl;
         return true;
+    }
 
 
     if (mSensor == System::IMU_MONOCULAR)
@@ -3434,10 +3443,15 @@ bool Tracking::TrackLocalMap()
     }
     else
     {
-        if(mnMatchesInliers<30)
+
+        if(mnMatchesInliers<30) { 
+            cout << "Exiting False from mnMathesInlier < 30" << endl;
             return false;
-        else
+        }
+        else {
+            cout << "Exiting True from mnMatchesInlier >= 30" << endl;
             return true;
+        }
     }
 }
 
@@ -3448,8 +3462,14 @@ bool Tracking::TrackLocalSuperMap()
     // We retrieve the local map and try to find matches to points in the local map.
     mTrackedFr++;
 
+    cout << "# of Map Points before updating in TrackLocalMap : " << mCurrentFrame.mvpMapPoints.size() << endl;
+
     UpdateLocalMap();
     SearchLocalPoints();
+
+    cout << "# of Map Points after updating in TrackLocalMap : " << mCurrentFrame.mvpMapPoints.size() << endl;
+
+    
 
     // TOO check outliers before PO
     int aux1 = 0, aux2=0;
@@ -3520,6 +3540,8 @@ bool Tracking::TrackLocalSuperMap()
             }
         }
     }
+
+    mnMatchesInliers = mCurrentFrame.matches_curr.size();
 
     cout << "mnMatchesInliers : " << mnMatchesInliers << endl; 
 
