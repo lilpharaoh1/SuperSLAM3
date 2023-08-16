@@ -2434,15 +2434,7 @@ void Tracking::SuperTrack()
 
     if(mState==NOT_INITIALIZED)
     {
-	// cout << "mState==NOT_INITIALIZED..." << endl;
-        if(mSensor==System::STEREO || mSensor==System::RGBD || mSensor==System::IMU_STEREO || mSensor==System::IMU_RGBD)
-        {
-            StereoInitialization();
-        }
-        else
-        {
-            MonocularInitialization();
-        }
+        MonocularInitialization();
 
         if(mState!=OK) // If rightly initialized, mState=OK
         {
@@ -3104,9 +3096,11 @@ bool Tracking::TrackReferenceKeyFrame()
     ORBmatcher matcher(0.7,true);
     vector<MapPoint*> vpMapPointMatches;
 
-    int nmatches = matcher.SearchBySuperBoW(mpReferenceKF,mCurrentFrame,vpMapPointMatches);
+    cout << "# of Map Points before SearchBySuperGlue : " << mCurrentFrame.mvpMapPoints.size() << endl;
 
-    cout << " # of Map Points after SearchBySuperBoW : " << mCurrentFrame.mvpMapPoints.size() << endl;
+    int nmatches = matcher.SearchBySuperGlue(mpReferenceKF,mCurrentFrame,vpMapPointMatches);
+
+    cout << "# of Map Points after SearchBySuperGlue : " << mCurrentFrame.mvpMapPoints.size() << endl;
 
     if(nmatches<15)
     {
@@ -3117,10 +3111,6 @@ bool Tracking::TrackReferenceKeyFrame()
     mCurrentFrame.mvpMapPoints = vpMapPointMatches;
     mCurrentFrame.SetPose(mLastFrame.GetPose());
 
-    //mCurrentFrame.PrintPointDistribution();
-
-
-    // cout << " TrackReferenceKeyFrame mLastFrame.mTcw:  " << mLastFrame.mTcw << endl;
     Optimizer::PoseOptimization(&mCurrentFrame);
 
     // Discard outliers
@@ -3541,8 +3531,6 @@ bool Tracking::TrackLocalSuperMap()
         }
     }
 
-    mnMatchesInliers = mCurrentFrame.matches_curr.size();
-
     cout << "mnMatchesInliers : " << mnMatchesInliers << endl; 
 
     // Decide if the tracking was succesful
@@ -3915,7 +3903,7 @@ void Tracking::SearchLocalPoints()
 
         // int matches = matcher.SearchByProjection(mCurrentFrame, mvpLocalMapPoints, th, mpLocalMapper->mbFarPoints, mpLocalMapper->mThFarPoints);
         vector<MapPoint*> vpMapPointMatches;
-        int matches = matcher.SearchBySuperBoW(mpReferenceKF,mCurrentFrame,vpMapPointMatches);
+        int matches = matcher.SearchBySuperGlue(mpReferenceKF,mCurrentFrame,vpMapPointMatches);
     }
 }
 
@@ -4150,7 +4138,7 @@ bool Tracking::Relocalization()
             vbDiscarded[i] = true;
         else
         {
-            int nmatches = matcher.SearchBySuperBoW(pKF,mCurrentFrame,vvpMapPointMatches[i]);
+            int nmatches = matcher.SearchBySuperGlue(pKF,mCurrentFrame,vvpMapPointMatches[i]);
             if(nmatches<15)
             {
                 vbDiscarded[i] = true;

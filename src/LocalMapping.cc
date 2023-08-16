@@ -397,6 +397,7 @@ void LocalMapping::MapPointCulling()
 
 void LocalMapping::CreateNewMapPoints()
 {
+    cout << "Inside CreateNewMapPoints..." << endl;
     // Retrieve neighbor keyframes in covisibility graph
     int nn = 10;
     // For stereo inertial case
@@ -702,6 +703,7 @@ void LocalMapping::CreateNewMapPoints()
 
             // Triangulation is succesfull
             MapPoint* pMP = new MapPoint(x3D, mpCurrentKeyFrame, mpAtlas->GetCurrentMap());
+            cout << "New MapPoint Created!" << endl;
             if (bPointStereo)
                 countStereo++;
             
@@ -711,7 +713,7 @@ void LocalMapping::CreateNewMapPoints()
             mpCurrentKeyFrame->AddMapPoint(pMP,idx1);
             pKF2->AddMapPoint(pMP,idx2);
 
-            pMP->ComputeDistinctiveDescriptors();
+            // pMP->ComputeDistinctiveDescriptors();
 
             pMP->UpdateNormalAndDepth();
 

@@ -426,16 +426,14 @@ namespace ORB_SLAM3
         return nmatches;
     }
 
-    int ORBmatcher::SearchBySuperBoW(KeyFrame* pKF,Frame &F, vector<MapPoint*> &vpMapPointMatches)
+    int ORBmatcher::SearchBySuperGlue(KeyFrame* pKF,Frame &F, vector<MapPoint*> &vpMapPointMatches)
     {
         int nmatches=0;        
         const vector<MapPoint*> vpMapPointsKF = pKF->GetMapPointMatches();
         
-        cout << "vpMapPointsKF.size() = " << vpMapPointsKF.size() << endl;
-        cout << "F.matches_curr.size() = " << F.matches_curr.size() << endl;
-
-        cout << "pKF.mvKeysUn.size() = " << pKF->mvKeysUn.size() << endl;
-        cout << "F.matches_prev.size() = " << F.matches_prev.size() << endl;
+        cout << "   vpMapPointsKF.size() = " << vpMapPointsKF.size() << endl;
+        cout << "   F.matches_curr.size() = " << F.matches_curr.size() << endl;
+        cout << "   F.matches_prev.size() = " << F.matches_prev.size() << endl;
 
 
         vpMapPointMatches = vector<MapPoint*>(F.N,static_cast<MapPoint*>(NULL));
@@ -959,6 +957,8 @@ namespace ORB_SLAM3
     int ORBmatcher::SearchForTriangulation(KeyFrame *pKF1, KeyFrame *pKF2,
                                            vector<pair<size_t, size_t> > &vMatchedPairs, const bool bOnlyStereo, const bool bCoarse)
     {
+        cout << "Start of SearchForTriangulation..." << endl;
+
         const DBoW2::FeatureVector &vFeatVec1 = pKF1->mFeatVec;
         const DBoW2::FeatureVector &vFeatVec2 = pKF2->mFeatVec;
 
@@ -1193,6 +1193,8 @@ namespace ORB_SLAM3
                 continue;
             vMatchedPairs.push_back(make_pair(i,vMatches12[i]));
         }
+
+        cout << "End of SearchByTriangulation, nmatches : " << nmatches << endl; 
 
         return nmatches;
     }
