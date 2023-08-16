@@ -198,6 +198,7 @@ protected:
 
     // Main tracking function. It is independent of the input sensor.
     void Track();
+    void SuperTrack();
 
     // Map initialization for stereo and RGB-D
     void StereoInitialization();
@@ -220,6 +221,7 @@ protected:
     void UpdateLocalKeyFrames();
 
     bool TrackLocalMap();
+    bool TrackLocalSuperMap();
     void SearchLocalPoints();
 
     bool NeedNewKeyFrame();

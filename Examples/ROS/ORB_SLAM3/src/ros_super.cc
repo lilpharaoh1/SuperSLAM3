@@ -78,6 +78,7 @@ int main(int argc, char **argv)
 
 void SuperHandler::GrabMatches(const super_msgs::MatchesStampedPtr& msg)
 {
+    cout << "----------------------------start of callback--------------------------" << endl;
     const double &timestamp = msg->header.stamp.toSec();
     vector<cv::Point2f> kpts;
     vector<int> mpts_prev, mpts_curr;
@@ -97,6 +98,7 @@ void SuperHandler::GrabMatches(const super_msgs::MatchesStampedPtr& msg)
     }
 
     mpSLAM->TrackSuper(kpts, mpts_prev, mpts_curr, confidences, timestamp);
+    cout << "----------------------------end of callback--------------------------" << endl;
 }
 
 
