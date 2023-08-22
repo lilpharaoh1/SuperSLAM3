@@ -954,6 +954,23 @@ namespace ORB_SLAM3
         return nmatches;
     }
 
+    int ORBmatcher::SearchForSuperGlueKF(KeyFrame *pKF1, KeyFrame *pKF2,
+                                           vector<pair<size_t, size_t> > &vMatchedPairs, const bool bOnlyStereo, const bool bCoarse)
+    {
+        int nmatches=0;        
+        nmatches = pKF2->matches_curr.size();
+
+        vMatchedPairs.clear();
+        vMatchedPairs.reserve(nmatches);
+
+        for(size_t i=0, iend=pKF2->matches_curr.size(); i<iend; i++)
+        {
+            vMatchedPairs.push_back(make_pair(pKF2->matches_prev[i],pKF2->matches_curr[i]));
+        }
+
+        return nmatches;
+    }
+
     int ORBmatcher::SearchForTriangulation(KeyFrame *pKF1, KeyFrame *pKF2,
                                            vector<pair<size_t, size_t> > &vMatchedPairs, const bool bOnlyStereo, const bool bCoarse)
     {

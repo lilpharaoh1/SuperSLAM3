@@ -2602,7 +2602,7 @@ void Tracking::SuperTrack()
             }
             mlpTemporalPoints.clear();
 
-            bool bNeedKF = NeedNewKeyFrame();
+            bool bNeedKF = true;//NeedNewKeyFrame();
 
             // Check if we need to insert a new keyframe
             // if(bNeedKF && bOK)
@@ -3522,7 +3522,8 @@ bool Tracking::TrackLocalSuperMap()
             if(!mCurrentFrame.mvbOutlier[i])
             {
                 mCurrentFrame.mvpMapPoints[i]->IncreaseFound();
-                if(mCurrentFrame.mvpMapPoints[i]->Observations()>0)
+                int obs = mCurrentFrame.mvpMapPoints[i]->Observations();
+                if(obs>0)
                     mnMatchesInliers++;
             }
             else {

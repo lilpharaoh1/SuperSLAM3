@@ -384,6 +384,9 @@ public:
     const std::vector<float> mvDepth; // negative value for monocular points
     const cv::Mat mDescriptors;
 
+    // Used by SuperSLAM3
+    std::vector<int> matches_prev, matches_curr;
+
     //BoW
     DBoW2::BowVector mBowVec;
     DBoW2::FeatureVector mFeatVec;

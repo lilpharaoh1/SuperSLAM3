@@ -74,6 +74,8 @@ namespace ORB_SLAM3
         int SearchBySuperGlue(KeyFrame* pKF,Frame &F, vector<MapPoint*> &vpMapPointMatches);
 
         // Matching to triangulate new MapPoints. Check Epipolar Constraint.
+        int SearchForSuperGlueKF(KeyFrame *pKF1, KeyFrame* pKF2,
+                                   std::vector<pair<size_t, size_t> > &vMatchedPairs, const bool bOnlyStereo, const bool bCoarse = false);
         int SearchForTriangulation(KeyFrame *pKF1, KeyFrame* pKF2,
                                    std::vector<pair<size_t, size_t> > &vMatchedPairs, const bool bOnlyStereo, const bool bCoarse = false);
 

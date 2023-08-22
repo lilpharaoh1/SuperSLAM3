@@ -1025,6 +1025,9 @@ int Optimizer::PoseOptimization(Frame *pFrame)
 
             const float chi2 = e->chi2();
 
+            // cout << "chi2 = " << chi2 << endl;
+            // cout << "chi2Mono[it] = " << chi2Mono[it] << endl;
+
             if(chi2>chi2Mono[it])
             {                
                 pFrame->mvbOutlier[idx]=true;
@@ -1036,6 +1039,8 @@ int Optimizer::PoseOptimization(Frame *pFrame)
                 pFrame->mvbOutlier[idx]=false;
                 e->setLevel(0);
             }
+
+            pFrame->mvbOutlier[idx]=false;
 
             if(it==2)
                 e->setRobustKernel(0);
@@ -1066,6 +1071,8 @@ int Optimizer::PoseOptimization(Frame *pFrame)
                 e->setLevel(0);
             }
 
+            pFrame->mvbOutlier[idx]=false;
+
             if(it==2)
                 e->setRobustKernel(0);
         }
@@ -1094,6 +1101,8 @@ int Optimizer::PoseOptimization(Frame *pFrame)
                 e->setLevel(0);
                 pFrame->mvbOutlier[idx]=false;
             }
+
+            pFrame->mvbOutlier[idx]=false;
 
             if(it==2)
                 e->setRobustKernel(0);
